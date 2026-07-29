@@ -63,6 +63,13 @@ because the docs and the v1→v2 table legitimately *name* the removed features.
   profile (it conflicts with Rule 0 as written)? Coupled entries?
 - Backlog B1–B7 in `plan.md`; nothing blocking.
 
+**Published.** Repo `pbueschel/postparade-v2` created public, `main` pushed,
+Pages enabled from `main` at root. Live at
+https://pbueschel.github.io/postparade-v2/ (app at `/app.html`); landing page,
+app shell, and all seven `app/*.js` modules return 200, and `#dashboard`,
+`#trainer/books/ELP`, and `#track/queue` were re-checked in headless Chrome
+against the deployed URL, not just `file://`.
+
 **Held.** Outward-facing v2 walkthrough materials, track-branded PDF exports,
 and the horse-profile question box. The site itself is published per Phil's
 go-ahead.
