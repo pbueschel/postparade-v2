@@ -1,0 +1,505 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PostParade — condition books, entries, and the racing office</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<script src="https://cdn.tailwindcss.com"></script>
+<script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
+<script>
+  tailwind.config = {
+    theme: {
+      extend: {
+        fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+        colors: {
+          ink: { 900: '#0b1220', 800: '#11192b', 700: '#1a2336', 600: '#2a3447', 500: '#475569', 400: '#94a3b8' },
+          turf: { 50: '#ecfdf5', 100: '#d1fae5', 300: '#6ee7b7', 500: '#10b981', 600: '#059669', 700: '#047857', 800: '#065f46' },
+          silk: { 400: '#f59e0b', 500: '#d97706' },
+        },
+      },
+    },
+  }
+</script>
+<style>
+  html, body { background: #f7f8fa; }
+  body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; color: #0b1220; }
+  .screen { display: none; }
+  .screen.active { display: block; }
+  .card { background: #fff; border: 1px solid #eef0f4; border-radius: 14px; }
+  .ring-soft { box-shadow: 0 1px 0 rgba(15,23,42,.04), 0 8px 24px -12px rgba(15,23,42,.08); }
+  .pill { display:inline-flex; align-items:center; gap:.25rem; font-size:.7rem; font-weight:600; padding:.15rem .5rem; border-radius:9999px; letter-spacing:.01em; }
+  .nav-item { transition: background-color .15s ease, color .15s ease; }
+  .nav-item.is-active { background: var(--accent-bg); color: var(--accent-strong); font-weight: 500; }
+  .nav-item.is-active i { color: var(--accent-strong); }
+  .row-hover:hover { background: #f8fafc; }
+  .kbd { font-family: 'JetBrains Mono', monospace; font-size:.7rem; padding:.1rem .35rem; border-radius:4px; background:#eef0f4; color:#475569; }
+  .mono { font-family: 'JetBrains Mono', monospace; }
+  .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
+  .cond-text { font-family: 'JetBrains Mono', monospace; font-size: .72rem; line-height: 1.6; }
+
+  /* Workspace accent system */
+  body[data-ws="trainer"] { --accent:#059669; --accent-bg:#ecfdf5; --accent-border:#a7f3d0; --accent-strong:#047857; }
+  body[data-ws="track"]   { --accent:#4f46e5; --accent-bg:#eef2ff; --accent-border:#c7d2fe; --accent-strong:#4338ca; }
+  body[data-ws="system"]  { --accent:#475569; --accent-bg:#f1f5f9; --accent-border:#cbd5e1; --accent-strong:#334155; }
+  .accent-bg { background: var(--accent); }
+  .accent-bg-h:hover { background: var(--accent-strong); }
+  .accent-text { color: var(--accent-strong); }
+  .accent-soft { background: var(--accent-bg); color: var(--accent-strong); }
+  .accent-border { border-color: var(--accent-border); }
+
+  body[data-ws="trainer"] .demo-banner { background: linear-gradient(90deg, #065f46, #0b1220); }
+  body[data-ws="track"]   .demo-banner { background: linear-gradient(90deg, #3730a3, #0b1220); }
+  body[data-ws="system"]  .demo-banner { background: linear-gradient(90deg, #334155, #0b1220); }
+
+  /* Sidebar nav visibility per workspace */
+  body[data-ws="trainer"] [data-nav="trainer"],
+  body[data-ws="track"]   [data-nav="track"],
+  body[data-ws="system"]  [data-nav="system"] { display: block; }
+  body[data-ws="trainer"] [data-nav]:not([data-nav="trainer"]),
+  body[data-ws="track"]   [data-nav]:not([data-nav="track"]),
+  body[data-ws="system"]  [data-nav]:not([data-nav="system"]) { display: none; }
+
+  .ws-menu { display: none; }
+  .ws-menu.open { display: block; }
+  .sidebar { background: #fafaf7; }
+  .sidebar-border { border-color: #e7e5df; }
+
+  @media (max-width: 767px) {
+    .sidebar { position: fixed; top: 0; bottom: 0; left: 0; width: 16rem; z-index: 50; transform: translateX(-100%); transition: transform .22s ease; }
+    body.sidebar-open .sidebar { transform: translateX(0); box-shadow: 0 25px 50px -12px rgba(0,0,0,.25); }
+  }
+  .sidebar-backdrop { position: fixed; inset: 0; background: rgba(11,18,32,.5); z-index: 40; opacity: 0; pointer-events: none; transition: opacity .22s ease; }
+  body.sidebar-open .sidebar-backdrop { opacity: 1; pointer-events: auto; }
+</style>
+</head>
+<body class="min-h-screen" data-ws="trainer">
+
+<!-- Demo banner -->
+<div class="demo-banner text-white text-xs px-4 py-1.5 flex items-center justify-between">
+  <div class="flex items-center gap-2">
+    <span class="inline-block w-1.5 h-1.5 rounded-full bg-turf-300 animate-pulse"></span>
+    <span class="opacity-90">PostParade — concept prototype · illustrative data · <strong>no ratings, predictions, or statistics anywhere in this build</strong></span>
+  </div>
+  <div class="flex items-center gap-3 opacity-80">
+    <span class="hidden lg:inline">Click the workspace name (top left) to switch between trainer, track, and system views</span>
+    <button id="pp-reset-demo" class="inline-flex items-center gap-1 px-2 py-0.5 rounded border border-white/25 hover:bg-white/10 transition" title="Clear saved submissions, decisions, and messages">
+      <i data-lucide="rotate-ccw" class="w-3 h-3"></i>Reset demo data
+    </button>
+  </div>
+</div>
+
+<div class="flex min-h-[calc(100vh-28px)]">
+  <div class="sidebar-backdrop md:hidden" id="sidebarBackdrop"></div>
+
+  <!-- Sidebar -->
+  <aside class="sidebar w-60 text-ink-700 flex flex-col border-r sidebar-border">
+    <div class="px-5 py-5 border-b sidebar-border">
+      <div class="flex items-center gap-2">
+        <div class="w-7 h-7 rounded-md bg-ink-900 flex items-center justify-center">
+          <i data-lucide="flag" class="w-4 h-4 text-turf-300"></i>
+        </div>
+        <div class="font-semibold tracking-tight text-ink-900">PostParade</div>
+      </div>
+    </div>
+
+    <!-- Workspace switcher -->
+    <div class="px-3 py-3 border-b sidebar-border relative">
+      <button id="wsSwitcher" class="w-full flex items-center justify-between px-3 py-2 rounded-lg bg-white border border-slate-200 hover:border-slate-300 text-sm">
+        <span class="flex items-center gap-2 min-w-0">
+          <span id="wsAbbr" class="w-5 h-5 rounded-full accent-bg text-white text-[10px] font-bold flex items-center justify-center shrink-0">KL</span>
+          <span class="text-left leading-tight min-w-0">
+            <span id="wsName" class="block text-ink-900 truncate">Kinnon LaRose</span>
+            <span id="wsRole" class="block text-[10px] text-ink-500 truncate">Trainer workspace</span>
+          </span>
+        </span>
+        <i data-lucide="chevrons-up-down" class="w-3.5 h-3.5 text-ink-500 shrink-0"></i>
+      </button>
+      <div id="wsMenu" class="ws-menu absolute left-3 right-3 top-full mt-1 z-40 rounded-lg bg-white border border-slate-200 shadow-lg overflow-hidden"></div>
+    </div>
+
+    <!-- Trainer nav -->
+    <nav data-nav="trainer" class="p-2 text-sm flex-1">
+      <a href="#dashboard" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="layout-dashboard" class="w-4 h-4"></i>Dashboard</a>
+      <a href="#trainer/horses" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="list" class="w-4 h-4"></i>My horses</a>
+      <a href="#trainer/books" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="book-open" class="w-4 h-4"></i>See condition books</a>
+      <a href="#trainer/windows" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="alarm-clock" class="w-4 h-4"></i>Entry windows
+        <span id="navWindowCount" class="ml-auto pill bg-slate-200 text-slate-700"></span>
+      </a>
+      <a href="#trainer/submissions" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="send" class="w-4 h-4"></i>Submissions
+        <span id="navSubCount" class="ml-auto pill bg-amber-100 text-amber-800"></span>
+      </a>
+      <a href="#trainer/messages" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="messages-square" class="w-4 h-4"></i>Messages</a>
+      <div class="mt-6 px-3 text-[10px] uppercase tracking-wider text-ink-500">Reference</div>
+      <a href="#system/log" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100 text-ink-500"><i data-lucide="scroll-text" class="w-4 h-4"></i>Activity log</a>
+    </nav>
+
+    <!-- Track nav -->
+    <nav data-nav="track" class="p-2 text-sm flex-1">
+      <a href="#track/dashboard" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="layout-dashboard" class="w-4 h-4"></i>Racing office</a>
+      <a href="#track/book" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="book-open" class="w-4 h-4"></i>Our condition book</a>
+      <a href="#track/queue" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="inbox" class="w-4 h-4"></i>Entry requests
+        <span id="navQueueCount" class="ml-auto pill bg-indigo-500 text-white"></span>
+      </a>
+      <a href="#track/horses" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="list" class="w-4 h-4"></i>Horses &amp; history</a>
+      <a href="#track/overnight" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="file-text" class="w-4 h-4"></i>Overnight sheets</a>
+      <a href="#track/messages" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="messages-square" class="w-4 h-4"></i>Messages</a>
+      <div class="mt-6 px-3 text-[10px] uppercase tracking-wider text-ink-500">Reference</div>
+      <a href="#system/log" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100 text-ink-500"><i data-lucide="scroll-text" class="w-4 h-4"></i>Activity log</a>
+    </nav>
+
+    <!-- System nav -->
+    <nav data-nav="system" class="p-2 text-sm flex-1">
+      <a href="#system/log" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="scroll-text" class="w-4 h-4"></i>Activity log</a>
+      <a href="#system/submissions" class="nav-item flex items-center gap-2 px-3 py-2 rounded-lg hover:bg-slate-100"><i data-lucide="database" class="w-4 h-4"></i>Submission records</a>
+    </nav>
+
+    <div class="p-3 border-t sidebar-border text-xs text-ink-500">
+      <div class="flex items-center gap-2">
+        <div id="userAbbr" class="w-7 h-7 rounded-full bg-ink-900 flex items-center justify-center text-white font-semibold">KL</div>
+        <div class="flex-1 min-w-0">
+          <div id="userName" class="text-ink-900 truncate">Kinnon LaRose</div>
+          <div id="userRole" class="text-[11px] truncate">Head trainer</div>
+        </div>
+        <a href="index.html" title="Sign out" class="p-1.5 rounded hover:bg-slate-100"><i data-lucide="log-out" class="w-3.5 h-3.5"></i></a>
+      </div>
+    </div>
+  </aside>
+
+  <!-- Main -->
+  <main class="flex-1 min-w-0">
+    <header class="bg-white border-b border-slate-200 px-4 md:px-6 py-3 flex items-center gap-2 md:gap-4 relative">
+      <button id="openSidebar" aria-label="Open menu" class="md:hidden p-1.5 -ml-1.5 rounded hover:bg-slate-100"><i data-lucide="menu" class="w-5 h-5"></i></button>
+      <div class="md:hidden flex items-center gap-1.5 font-semibold">
+        <div class="w-6 h-6 rounded-md bg-ink-900 flex items-center justify-center"><i data-lucide="flag" class="w-3 h-3 text-turf-300"></i></div>
+        <span>PostParade</span>
+      </div>
+      <div class="flex-1 max-w-xl hidden md:block">
+        <div class="relative">
+          <i data-lucide="search" class="w-4 h-4 absolute left-3 top-2.5 text-slate-400"></i>
+          <input id="globalSearch" placeholder="Search horses, tracks, races…" class="w-full pl-9 pr-3 py-2 text-sm rounded-lg bg-slate-100 border border-transparent focus:bg-white focus:border-slate-300 focus:outline-none">
+          <div id="searchResults" class="hidden absolute left-0 right-0 top-full mt-1 z-40 rounded-lg bg-white border border-slate-200 shadow-lg overflow-hidden max-h-80 overflow-y-auto scrollbar-thin"></div>
+        </div>
+      </div>
+      <div class="flex-1 md:hidden"></div>
+      <div class="relative">
+        <button id="bellBtn" class="inline-flex items-center gap-1.5 text-sm text-slate-600 hover:text-ink-900 relative p-1.5 rounded hover:bg-slate-100">
+          <i data-lucide="bell" class="w-4 h-4"></i>
+          <span id="bellDot" class="absolute top-1 right-1 w-1.5 h-1.5 rounded-full bg-red-500 hidden"></span>
+        </button>
+        <div id="bellPanel" class="hidden absolute right-0 top-full mt-2 w-80 rounded-lg bg-white border border-slate-200 shadow-lg z-40 overflow-hidden"></div>
+      </div>
+      <button id="topCta" class="inline-flex items-center gap-1.5 px-2.5 md:px-3 py-1.5 text-sm rounded-lg accent-bg accent-bg-h text-white">
+        <i data-lucide="plus" class="w-4 h-4"></i><span id="topCtaLabel" class="hidden md:inline">Add horse</span>
+      </button>
+    </header>
+
+    <!-- Trainer screens -->
+    <section id="dashboard" class="screen p-6 space-y-6"></section>
+    <section id="trainer/horses" class="screen p-6 space-y-6"></section>
+    <section id="scr-books" class="screen p-6 space-y-6"></section>
+    <section id="trainer/windows" class="screen p-6 space-y-6"></section>
+    <section id="trainer/submissions" class="screen p-6 space-y-6"></section>
+    <section id="scr-trainer-messages" class="screen p-6 space-y-6"></section>
+    <section id="scr-horse" class="screen p-6 space-y-6"></section>
+    <section id="scr-race" class="screen p-6 space-y-6"></section>
+
+    <!-- Track screens -->
+    <section id="track/dashboard" class="screen p-6 space-y-6"></section>
+    <section id="scr-track-book" class="screen p-6 space-y-6"></section>
+    <section id="track/queue" class="screen p-6 space-y-6"></section>
+    <section id="track/horses" class="screen p-6 space-y-6"></section>
+    <section id="scr-track-overnight" class="screen p-6 space-y-6"></section>
+    <section id="scr-track-messages" class="screen p-6 space-y-6"></section>
+    <section id="scr-track-race" class="screen p-6 space-y-6"></section>
+
+    <!-- System screens -->
+    <section id="system/log" class="screen p-6 space-y-6"></section>
+    <section id="system/submissions" class="screen p-6 space-y-6"></section>
+  </main>
+</div>
+
+<script src="app/data.js"></script>
+<script src="app/conditions.js"></script>
+<script src="app/store.js"></script>
+<script src="app/render.js"></script>
+<script src="app/screens-trainer.js"></script>
+<script src="app/screens-track.js"></script>
+<script src="app/screens-system.js"></script>
+<script>
+  lucide.createIcons();
+
+  /* ---------- Session (which workspace, and for tracks, which track) ------- */
+  const SESSION_KEY = 'pp2.session';
+  const session = (() => {
+    try { return JSON.parse(localStorage.getItem(SESSION_KEY)) || {}; } catch (e) { return {}; }
+  })();
+  window.PPSession = {
+    get trackId() { return session.trackId || 'ELP'; },
+    set trackId(v) { session.trackId = v; persist(); },
+    get stableId() { return PPData.demoStable().id; },
+  };
+  function persist() { try { localStorage.setItem(SESSION_KEY, JSON.stringify(session)); } catch (e) {} }
+
+  /* ---------- Workspaces --------------------------------------------------- */
+  function trackWorkspaces() {
+    return PPData.pairedTracks().map((t) => ({
+      key: 'track:' + t.id, ws: 'track', trackId: t.id, name: t.name,
+      abbr: t.id.slice(0, 2), role: 'Track workspace',
+      userName: t.office, userRole: 'Racing secretary — ' + (t.racingSecretary || ''),
+      sub: 'Track · ' + (t.discipline === 'QH' ? 'Quarter Horse meet' : 'Thoroughbred meet'),
+      home: 'track/dashboard', cta: 'New overnight', ctaHref: 'track/overnight',
+    }));
+  }
+  function allWorkspaces() {
+    const stable = PPData.demoStable();
+    return [{
+      key: 'trainer', ws: 'trainer', name: stable.trainer, abbr: 'KL', role: 'Trainer workspace',
+      userName: stable.trainer, userRole: 'Head trainer · ' + stable.name,
+      sub: 'Trainer · ' + PPStore.rosterFor(stable.id).length + ' horses',
+      home: 'dashboard', cta: 'Add horse', ctaHref: 'trainer/horses?add=1',
+    }].concat(trackWorkspaces()).concat([{
+      key: 'system', ws: 'system', name: 'System log', abbr: 'SY', role: 'App developer view',
+      userName: 'PostParade', userRole: 'Application log',
+      sub: 'Developer · every event with its timestamp',
+      home: 'system/log', cta: 'Refresh', ctaHref: 'system/log',
+    }]);
+  }
+  function currentWsKey() {
+    const ws = document.body.dataset.ws;
+    return ws === 'track' ? 'track:' + PPSession.trackId : ws;
+  }
+  function applyWorkspace(key) {
+    const w = allWorkspaces().find((x) => x.key === key) || allWorkspaces()[0];
+    if (w.trackId) PPSession.trackId = w.trackId;
+    document.body.dataset.ws = w.ws;
+    document.getElementById('wsName').textContent = w.name;
+    document.getElementById('wsAbbr').textContent = w.abbr;
+    document.getElementById('wsRole').textContent = w.role;
+    document.getElementById('userName').textContent = w.userName;
+    document.getElementById('userAbbr').textContent = w.abbr;
+    document.getElementById('userRole').textContent = w.userRole;
+    document.getElementById('topCtaLabel').textContent = w.cta;
+    document.getElementById('topCta').dataset.href = w.ctaHref;
+    renderWsMenu();
+  }
+  function renderWsMenu() {
+    const cur = currentWsKey();
+    document.getElementById('wsMenu').innerHTML =
+      '<div class="px-3 pt-3 pb-1 text-[10px] uppercase tracking-wider text-ink-500">Your workspaces</div>' +
+      allWorkspaces().map((w) => `
+        <button data-go="${w.key}" class="ws-opt w-full flex items-center gap-2 px-3 py-2 text-sm text-ink-900 hover:bg-slate-50 text-left">
+          <span class="w-6 h-6 rounded-full ${w.ws === 'trainer' ? 'bg-turf-600' : w.ws === 'track' ? 'bg-indigo-500' : 'bg-slate-500'} text-white text-[10px] font-bold flex items-center justify-center shrink-0">${w.abbr}</span>
+          <span class="flex-1 min-w-0">
+            <span class="block truncate">${w.name}</span>
+            <span class="block text-[10px] text-ink-500 truncate">${w.sub}</span>
+          </span>
+          <i data-lucide="check" class="w-3.5 h-3.5 text-turf-600 ${w.key === cur ? '' : 'hidden'}"></i>
+        </button>`).join('');
+    lucide.createIcons();
+  }
+
+  /* ---------- Routing ----------------------------------------------------- */
+  // Parameterized routes resolve to one shared section; the renderer receives
+  // the parameter. Longest prefix first.
+  const paramRoutes = [
+    { prefix: 'trainer/books/',    section: 'scr-books' },
+    { prefix: 'trainer/messages/', section: 'scr-trainer-messages' },
+    { prefix: 'track/book/',       section: 'scr-track-book' },
+    { prefix: 'track/overnight/',  section: 'scr-track-overnight' },
+    { prefix: 'track/messages/',   section: 'scr-track-messages' },
+    { prefix: 'track/race/',       section: 'scr-track-race' },
+    { prefix: 'horse/',            section: 'scr-horse' },
+    { prefix: 'race/',             section: 'scr-race' },
+  ];
+  const exactRoutes = {
+    'trainer/books': 'scr-books',
+    'trainer/messages': 'scr-trainer-messages',
+    'track/book': 'scr-track-book',
+    'track/overnight': 'scr-track-overnight',
+    'track/messages': 'scr-track-messages',
+  };
+  function resolveRoute(id) {
+    if (exactRoutes[id]) return { section: exactRoutes[id], param: null, route: id };
+    const r = paramRoutes.find((x) => id.startsWith(x.prefix));
+    return r ? { section: r.section, param: decodeURIComponent(id.slice(r.prefix.length)), route: id }
+             : { section: id, param: null, route: id };
+  }
+  // Which workspace a route belongs to (so deep links switch workspace).
+  function wsForRoute(id) {
+    if (id.startsWith('track/')) return 'track';
+    if (id.startsWith('system/')) return 'system';
+    if (id === 'dashboard' || id.startsWith('trainer/') || id.startsWith('horse/') || id.startsWith('race/')) return 'trainer';
+    return null;
+  }
+
+  function showScreen(hash) {
+    const raw = (hash || '#dashboard').slice(1) || 'dashboard';
+    const id = raw.split('?')[0];
+    const route = resolveRoute(id);
+    const wsKey = wsForRoute(id);
+    if (wsKey && wsKey !== document.body.dataset.ws) {
+      applyWorkspace(wsKey === 'track' ? 'track:' + PPSession.trackId : wsKey);
+    }
+    document.querySelectorAll('.screen').forEach((s) => s.classList.remove('active'));
+    const el = document.getElementById(route.section) || document.getElementById('dashboard');
+    el.classList.add('active');
+
+    const render = window.PPRenderers && PPRenderers[route.section];
+    if (render) {
+      try { render(route.param, raw); } catch (err) {
+        el.innerHTML = '<div class="card ring-soft p-6 text-sm text-red-700">Render error: ' +
+          esc(err && err.message) + '</div>';
+        console.error(err);
+      }
+      lucide.createIcons();
+    }
+    document.querySelectorAll('.nav-item').forEach((a) => {
+      const h = (a.getAttribute('href') || '').slice(1);
+      a.classList.toggle('is-active', h === id || (h !== 'dashboard' && id.startsWith(h + '/')));
+    });
+    refreshChrome();
+    window.scrollTo({ top: 0, behavior: 'instant' });
+  }
+  window.addEventListener('hashchange', () => showScreen(location.hash));
+  window.rerender = () => showScreen(location.hash);
+
+  /* ---------- Sidebar badges + notification bell -------------------------- */
+  function refreshChrome() {
+    const stableId = PPSession.stableId;
+    const pending = PPStore.listSubmissions({ stableId, status: 'pending' }).length;
+    const subEl = document.getElementById('navSubCount');
+    subEl.textContent = pending || '';
+    subEl.classList.toggle('hidden', !pending);
+
+    const closing = PPData.listRaces({ openOnly: true })
+      .filter((r) => hoursUntil(r.entryClose) < 48).length;
+    const winEl = document.getElementById('navWindowCount');
+    winEl.textContent = closing || '';
+    winEl.classList.toggle('hidden', !closing);
+
+    const queue = PPStore.listSubmissions({ trackId: PPSession.trackId, status: 'pending' }).length;
+    const qEl = document.getElementById('navQueueCount');
+    qEl.textContent = queue || '';
+    qEl.classList.toggle('hidden', !queue);
+
+    const unread = PPStore.notifications().filter((n) => !n.read).length;
+    document.getElementById('bellDot').classList.toggle('hidden', !unread);
+  }
+
+  document.getElementById('bellBtn').addEventListener('click', (e) => {
+    e.stopPropagation();
+    const panel = document.getElementById('bellPanel');
+    const ns = PPStore.notifications();
+    panel.innerHTML = `
+      <div class="px-3 py-2 border-b border-slate-100 flex items-center justify-between">
+        <span class="text-xs font-semibold text-ink-900">Overnights &amp; extras</span>
+        <button id="markAllRead" class="text-[11px] text-ink-500 hover:text-ink-900">Mark all read</button>
+      </div>
+      ${ns.length ? ns.map((n) => `
+        <a href="#${n.raceId ? 'race/' + n.raceId : n.raceDayId ? 'track/overnight/' + n.raceDayId : 'trainer/windows'}"
+           data-ntf="${n.id}" class="block px-3 py-2.5 hover:bg-slate-50 border-b border-slate-50 last:border-0">
+          <div class="flex items-start gap-2">
+            <i data-lucide="${n.kind === 'extra' ? 'plus-circle' : n.kind === 'book' ? 'book-open' : 'file-text'}" class="w-3.5 h-3.5 mt-0.5 ${n.read ? 'text-slate-300' : 'text-indigo-500'}"></i>
+            <div class="min-w-0">
+              <div class="text-xs font-medium text-ink-900">${esc(n.title)}</div>
+              <div class="text-[11px] text-ink-500 leading-snug">${esc(n.body)}</div>
+              <div class="text-[10px] text-ink-400 mt-0.5">${fmtStamp(n.at)} · ${fmtAgo(n.at)}</div>
+            </div>
+          </div>
+        </a>`).join('') : '<div class="px-3 py-4 text-xs text-ink-500">No notifications.</div>'}`;
+    panel.classList.toggle('hidden');
+    lucide.createIcons();
+  });
+  document.addEventListener('click', (e) => {
+    const panel = document.getElementById('bellPanel');
+    if (!panel.contains(e.target)) panel.classList.add('hidden');
+    const ntf = e.target.closest && e.target.closest('[data-ntf]');
+    if (ntf) { PPStore.markNotificationRead(ntf.dataset.ntf); refreshChrome(); }
+    if (e.target.id === 'markAllRead') {
+      PPStore.notifications().forEach((n) => PPStore.markNotificationRead(n.id));
+      refreshChrome();
+      panel.classList.add('hidden');
+    }
+  });
+
+  /* ---------- Workspace dropdown ----------------------------------------- */
+  const wsMenu = document.getElementById('wsMenu');
+  document.getElementById('wsSwitcher').addEventListener('click', (e) => {
+    e.stopPropagation(); wsMenu.classList.toggle('open');
+  });
+  document.addEventListener('click', (e) => {
+    const opt = e.target.closest && e.target.closest('.ws-opt');
+    if (opt) {
+      const w = allWorkspaces().find((x) => x.key === opt.dataset.go);
+      wsMenu.classList.remove('open');
+      applyWorkspace(opt.dataset.go);
+      location.hash = '#' + (w ? w.home : 'dashboard');
+      window.rerender();
+      return;
+    }
+    if (!wsMenu.contains(e.target)) wsMenu.classList.remove('open');
+  });
+
+  /* ---------- Global search (horses · tracks · races) --------------------- */
+  const searchInput = document.getElementById('globalSearch');
+  const searchBox = document.getElementById('searchResults');
+  searchInput.addEventListener('input', () => {
+    const q = searchInput.value.trim().toLowerCase();
+    if (q.length < 2) { searchBox.classList.add('hidden'); return; }
+    const horses = PPData.horses.filter((h) => h.name.toLowerCase().includes(q)).slice(0, 5);
+    const tks = PPData.pairedTracks().filter((t) => t.name.toLowerCase().includes(q)).slice(0, 4);
+    const races = PPData.listRaces({ openOnly: true }).filter((r) => {
+      const t = PPData.getTrack(PPData.trackOfRace(r));
+      return (r.name || '').toLowerCase().includes(q) || (t && t.name.toLowerCase().includes(q));
+    }).slice(0, 5);
+    const row = (href, icon, main, sub) => `
+      <a href="${href}" class="flex items-center gap-2 px-3 py-2 hover:bg-slate-50 border-b border-slate-50 last:border-0">
+        <i data-lucide="${icon}" class="w-3.5 h-3.5 text-slate-400"></i>
+        <span class="text-sm text-ink-900">${esc(main)}</span>
+        <span class="ml-auto text-[11px] text-ink-500">${esc(sub)}</span></a>`;
+    const html = [
+      horses.map((h) => row('#horse/' + h.id, h.icon || 'rabbit', h.name, h.trainer)).join(''),
+      tks.map((t) => row('#trainer/books/' + t.id, 'book-open', t.name, 'Condition book')).join(''),
+      races.map((r) => row('#race/' + r.id, 'flag-triangle-right',
+        (PPData.getTrack(PPData.trackOfRace(r)) || {}).name + ' R' + r.raceNumber,
+        r.typeLabel + ' · ' + fmtMoney(r.purse))).join(''),
+    ].join('');
+    searchBox.innerHTML = html || '<div class="px-3 py-3 text-xs text-ink-500">No matches.</div>';
+    searchBox.classList.remove('hidden');
+    lucide.createIcons();
+  });
+  document.addEventListener('click', (e) => {
+    if (!searchBox.contains(e.target) && e.target !== searchInput) searchBox.classList.add('hidden');
+  });
+
+  /* ---------- Mobile drawer ---------------------------------------------- */
+  document.getElementById('openSidebar').addEventListener('click', () => document.body.classList.add('sidebar-open'));
+  document.getElementById('sidebarBackdrop').addEventListener('click', () => document.body.classList.remove('sidebar-open'));
+  document.querySelectorAll('.nav-item').forEach((a) => a.addEventListener('click', () => document.body.classList.remove('sidebar-open')));
+
+  /* ---------- Modal dismissal -------------------------------------------- */
+  document.addEventListener('click', (e) => {
+    if (e.target.closest && (e.target.closest('[data-modal-close]') || e.target.closest('.pp-modal-cancel'))) closeModal();
+  });
+  document.addEventListener('keydown', (e) => { if (e.key === 'Escape') closeModal(); });
+
+  /* ---------- Reset + top CTA -------------------------------------------- */
+  document.getElementById('pp-reset-demo').addEventListener('click', () => PPStore.reset());
+  document.getElementById('topCta').addEventListener('click', (e) => {
+    const href = e.currentTarget.dataset.href;
+    if (href) location.hash = '#' + href;
+    window.rerender();
+  });
+
+  /* ---------- Boot -------------------------------------------------------- */
+  applyWorkspace(wsForRoute((location.hash || '#dashboard').slice(1).split('?')[0]) === 'track'
+    ? 'track:' + PPSession.trackId
+    : (wsForRoute((location.hash || '#dashboard').slice(1).split('?')[0]) || 'trainer'));
+  showScreen(location.hash);
+</script>
+</body>
+</html>
