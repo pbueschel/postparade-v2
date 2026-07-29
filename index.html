@@ -1,0 +1,294 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PostParade — condition books, entries, and the racing office</title>
+<meta name="description" content="A two-sided prototype where tracks post condition books and trainers request entries. Facts and conditions only — no ratings, no predictions.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+  *, *::before, *::after { box-sizing: border-box; }
+  :root {
+    --bg: #fbfaf7; --ink: #0b1220; --ink-2: #475569; --ink-3: #94a3b8;
+    --turf: #059669; --turf-2: #10b981; --turf-soft: #ecfdf5;
+    --indigo: #4f46e5; --indigo-soft: #eef2ff;
+    --amber: #d97706; --amber-soft: #fffbeb;
+    --card: #fff; --border: #eef0f4;
+    --radius: 14px; --shadow: 0 8px 24px -12px rgba(15,23,42,.08);
+  }
+  body { margin: 0; background: var(--bg); color: var(--ink);
+    font-family: Inter, system-ui, -apple-system, sans-serif; -webkit-font-smoothing: antialiased; line-height: 1.55; }
+  .wrap { max-width: 1060px; margin: 0 auto; padding: 0 20px; }
+  a { color: inherit; }
+  code, .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: .85em; }
+
+  header.top { border-bottom: 1px solid var(--border); background: rgba(255,255,255,.85);
+    backdrop-filter: blur(8px); position: sticky; top: 0; z-index: 10; }
+  .top-in { display: flex; align-items: center; gap: 12px; padding: 14px 0; }
+  .logo { width: 32px; height: 32px; border-radius: 9px; background: var(--ink);
+    display: grid; place-items: center; color: #6ee7b7; font-weight: 700; font-size: 15px; }
+  .brand { font-weight: 600; letter-spacing: -.01em; }
+  .tag { font-size: 11px; color: var(--ink-2); border: 1px solid var(--border);
+    border-radius: 999px; padding: 2px 9px; background: #fff; }
+  .top-links { margin-left: auto; display: flex; gap: 16px; font-size: 14px; color: var(--ink-2); }
+  .top-links a:hover { color: var(--ink); }
+
+  .hero { padding: 64px 0 40px; }
+  .eyebrow { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--turf); font-weight: 600; }
+  h1 { font-size: clamp(30px, 5vw, 46px); line-height: 1.1; letter-spacing: -.025em; margin: 12px 0 0; }
+  .lede { font-size: 18px; color: var(--ink-2); max-width: 62ch; margin: 16px 0 0; }
+  .cta-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 18px; border-radius: 10px;
+    font-size: 15px; font-weight: 500; text-decoration: none; border: 1px solid transparent; }
+  .btn-primary { background: var(--ink); color: #fff; }
+  .btn-primary:hover { background: #11192b; }
+  .btn-ghost { border-color: #dcdfe5; background: #fff; color: var(--ink); }
+  .btn-ghost:hover { border-color: #c3c8d1; }
+
+  section { padding: 40px 0; }
+  h2 { font-size: 24px; letter-spacing: -.02em; margin: 0 0 6px; }
+  .sub { color: var(--ink-2); margin: 0 0 22px; max-width: 70ch; }
+  h3 { font-size: 16px; margin: 0 0 6px; }
+
+  .grid { display: grid; gap: 16px; }
+  .g2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+  .g3 { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
+  .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow); padding: 22px; }
+  .card p { color: var(--ink-2); margin: 0; font-size: 14.5px; }
+  .pill { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600;
+    padding: 3px 9px; border-radius: 999px; }
+  .pill-turf { background: var(--turf-soft); color: #047857; }
+  .pill-indigo { background: var(--indigo-soft); color: #4338ca; }
+  .pill-amber { background: var(--amber-soft); color: #b45309; }
+  .pill-slate { background: #f1f5f9; color: #475569; }
+
+  .split { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
+  .side { border-left: 3px solid var(--turf); padding-left: 16px; }
+  .side.track { border-left-color: var(--indigo); }
+  ul.clean { margin: 10px 0 0; padding-left: 18px; color: var(--ink-2); font-size: 14.5px; }
+  ul.clean li { margin: 6px 0; }
+
+  table { width: 100%; border-collapse: collapse; font-size: 14px; }
+  .table-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); background: #fff; }
+  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
+  th { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-3);
+    background: #fafbfc; font-weight: 600; }
+  tr:last-child td { border-bottom: 0; }
+  td.gone { color: #b91c1c; }
+  td.now { color: #047857; }
+
+  .callout { background: var(--turf-soft); border: 1px solid #a7f3d0; border-radius: var(--radius);
+    padding: 20px 22px; }
+  .callout h3 { color: #065f46; }
+  .callout p { color: #065f46; font-size: 14.5px; margin: 6px 0 0; }
+
+  footer { border-top: 1px solid var(--border); padding: 28px 0 48px; color: var(--ink-3); font-size: 13px; }
+  footer a { color: var(--ink-2); }
+</style>
+</head>
+<body>
+
+<header class="top">
+  <div class="wrap top-in">
+    <div class="logo">⚑</div>
+    <div class="brand">PostParade</div>
+    <span class="tag">v2 · revision build</span>
+    <nav class="top-links">
+      <a href="app.html">Open the app</a>
+      <a href="#what-changed">What changed</a>
+      <a href="https://pbueschel.github.io/postparade/">v1</a>
+    </nav>
+  </div>
+</header>
+
+<main class="wrap">
+
+  <div class="hero">
+    <div class="eyebrow">Trainers ⇄ racing offices</div>
+    <h1>Tracks post their condition books.<br>Trainers request entries. People decide.</h1>
+    <p class="lede">
+      A rebuild of the PostParade prototype around one principle: the software handles the paperwork
+      and reads the conditions. It does not rate horses, forecast races, or recommend anything.
+      Every submission is reviewed by a person at the racing office, and every step is timestamped
+      on all three ends — trainer, track, and system record.
+    </p>
+    <div class="cta-row">
+      <a class="btn btn-primary" href="app.html">Open the app →</a>
+      <a class="btn btn-ghost" href="app.html#trainer/books">Start at a condition book</a>
+      <a class="btn btn-ghost" href="app.html#track/queue">See the office queue</a>
+    </div>
+  </div>
+
+  <section>
+    <h2>The loop</h2>
+    <p class="sub">Four steps, no black box in the middle.</p>
+    <div class="grid g3">
+      <div class="card">
+        <span class="pill pill-indigo">1 · Track</span>
+        <h3 style="margin-top:10px">Publish the book</h3>
+        <p>The racing office posts its condition book: every race, its purse, surface, distance,
+          conditions as written, and how many spots it holds.</p>
+      </div>
+      <div class="card">
+        <span class="pill pill-turf">2 · Trainer</span>
+        <h3 style="margin-top:10px">Read it and submit</h3>
+        <p>Select a track, sort the card chronologically, filter by entry close, race date, surface,
+          type, or purse. Name a jockey, flag AE or MTO, submit.</p>
+      </div>
+      <div class="card">
+        <span class="pill pill-amber">3 · Checker</span>
+        <h3 style="margin-top:10px">Check the conditions</h3>
+        <p>Sex, age, maiden and non-winners ladders, claiming and starter clauses, state-bred
+          restrictions, breed registry, vet's list. Conflicts are flagged, never ruled on.</p>
+      </div>
+      <div class="card">
+        <span class="pill pill-indigo">4 · Track</span>
+        <h3 style="margin-top:10px">Accept or decline</h3>
+        <p>The office accepts, or declines with a standard reason plus a comment for the one-off
+          cases. The trainer sees the reason, the comment, and the timestamp.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <h2>Both sides, same records</h2>
+    <div class="split">
+      <div class="side">
+        <span class="pill pill-turf">Trainer workspace</span>
+        <h3 style="margin-top:10px">Kinnon LaRose Racing</h3>
+        <ul class="clean">
+          <li><strong>Dashboard</strong> — the barn in three actionable states: active, placement requested, entered. Filterable. No performance figures.</li>
+          <li><strong>My horses</strong> — the whole roster; add, remove, pursue races.</li>
+          <li><strong>See condition books</strong> — pick a track, read the book, filter it, submit. “See all conditions” shows the raw text when you read a clause differently than the checker.</li>
+          <li><strong>Entry windows</strong> — deadlines and watched races, on a page you visit on purpose.</li>
+          <li><strong>Submissions</strong> — every request you have sent and what came back.</li>
+          <li><strong>Messages</strong> — a stored thread with each racing office.</li>
+        </ul>
+      </div>
+      <div class="side track">
+        <span class="pill pill-indigo">Track workspace</span>
+        <h3 style="margin-top:10px">Ellis Park · Saratoga · Evangeline Downs · Delta Downs</h3>
+        <ul class="clean">
+          <li><strong>Racing office</strong> — what is waiting, and which races sit under their minimum field.</li>
+          <li><strong>Our condition book</strong> — the book as trainers see it, with spots and pending requests per race.</li>
+          <li><strong>Entry requests</strong> — accept, or decline with a reason and a comment on the record.</li>
+          <li><strong>Horses &amp; history</strong> — who is entered on each card, plus the standing record of every horse that has come through: new here, or N starts here.</li>
+          <li><strong>Overnight sheets</strong> — drafted automatically from accepted entries.</li>
+        </ul>
+      </div>
+    </div>
+  </section>
+
+  <section id="what-changed">
+    <h2>What changed from v1</h2>
+    <p class="sub">The first build put a recommendation engine at the centre. This one takes it out and
+      puts the condition book there instead.</p>
+    <div class="table-scroll">
+      <table>
+        <thead>
+          <tr><th style="width:34%">v1</th><th style="width:33%">v2</th><th>Why</th></tr>
+        </thead>
+        <tbody>
+          <tr><td class="gone">Fit scores, acceptance likelihood, draw-in probability</td>
+              <td class="now">A condition checker that flags conflicts</td>
+              <td>Eligibility is a rule question. Outcome is not our call.</td></tr>
+          <tr><td class="gone">Recommendations screen</td>
+              <td class="now">See condition books → select track → race list</td>
+              <td>Trainers read the book. The app gets them to it faster.</td></tr>
+          <tr><td class="gone">“Spot alerts” and a dashboard block of closing entries</td>
+              <td class="now">One <strong>Entry windows</strong> page</td>
+              <td>The capability stays; it stops being pushed at you.</td></tr>
+          <tr><td class="gone">Suggested ships, win rates, speed and class figures</td>
+              <td class="now">Records and past performances, as facts</td>
+              <td>Nothing statistical about a future or past result.</td></tr>
+          <tr><td class="gone">Horses tab deep-linked to one horse</td>
+              <td class="now">A real roster for trainers; entries and history for tracks</td>
+              <td>It was a bug, and the tab had no defined contents.</td></tr>
+          <tr><td class="gone">Requests inbox</td>
+              <td class="now">A submissions log, trainer → track</td>
+              <td>Submissions are the record that needs storing.</td></tr>
+          <tr><td class="gone">No messaging</td>
+              <td class="now">Stored threads between office and barn</td>
+              <td>Most placement questions are a conversation.</td></tr>
+          <tr><td class="gone">Hover to act on a horse row</td>
+              <td class="now">The underlined horse name is the link, always</td>
+              <td>Hover did not fire on horses already placed.</td></tr>
+          <tr><td class="gone">Thin horse pages</td>
+              <td class="now">Equibase-shaped profiles</td>
+              <td>Color, sex, state bred, year foaled, sire and dam, connections of last start.</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </section>
+
+  <section>
+    <h2>Also in this build</h2>
+    <div class="grid g2">
+      <div class="card">
+        <h3>A jockey is named at submission</h3>
+        <p>Required, from a rider list with agents, so the office can catch double-bookings before
+          the entry box closes.</p>
+      </div>
+      <div class="card">
+        <h3>“Submit anyway” when a conflict is flagged</h3>
+        <p>The checker can be wrong, and clauses are ambiguous. The trainer may always override; the
+          flags are snapshotted onto the record so the office reviews what was shown.</p>
+      </div>
+      <div class="card">
+        <h3>AE / MTO designations</h3>
+        <p>Also-eligible and main-track-only requests carry through to the overnight sheet.</p>
+      </div>
+      <div class="card">
+        <h3>Overnights and extras notify</h3>
+        <p>When a card's overnight posts or a race is added after the book, it shows up in the bell
+          and on Entry windows.</p>
+      </div>
+      <div class="card">
+        <h3>Spots are public to both sides</h3>
+        <p>Spots filled, openings left, also-eligible places used, requests awaiting review — one
+          number, same on both ends.</p>
+      </div>
+      <div class="card">
+        <h3>Timestamps on three ends</h3>
+        <p>Submitted, decided, by whom. The trainer view, the office view, and the system activity
+          log read the same append-only rows.</p>
+      </div>
+    </div>
+  </section>
+
+  <section>
+    <div class="callout">
+      <h3>Still open</h3>
+      <p><strong>Equipment at entry</strong> — whether the track requires equipment declared at submission
+        is unconfirmed, so the field is present and advisory, never a blocker.
+        <strong>Equibase rating</strong> — whether it belongs on a horse profile is an open question.
+        <strong>Planned, not built:</strong> track-branded PDF condition books and overnights, and a
+        question box on the horse profile answered from the record.</p>
+    </div>
+  </section>
+
+  <section>
+    <h2>About the data</h2>
+    <p class="sub">
+      Real where it is cited: trainer, horses, sires and dams, owners, and the results referenced in
+      each profile. Illustrative where it must be: the condition books, race cards, spot counts,
+      messages, and the demo calendar, which rolls forward off the clock so the books are always open.
+      Nothing in here is a rating or a projection, and no number claims to be one.
+      This is a concept prototype, not a system of record.
+    </p>
+  </section>
+
+</main>
+
+<footer>
+  <div class="wrap">
+    PostParade v2 — concept prototype · <a href="app.html">Open the app</a> ·
+    <a href="https://pbueschel.github.io/postparade/">v1 build</a>
+  </div>
+</footer>
+
+</body>
+</html>
