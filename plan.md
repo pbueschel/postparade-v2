@@ -33,9 +33,11 @@ of the 2026-07-29 session, so the site itself is **not** held. What remains held
 
 - [ ] **Pick a classic direction** (2026-08-06). Three variants across all five
       screens in `docs/mockups/2026-08-06-classic/index.html` — Paddock
-      (restrained), Condition Book (the partner's), Racing Form (newsprint).
-      Nothing is wired up until Phil picks one; adopting it means a pass over
-      `index.html` and every `app/screens-*.js`.
+      (restrained), Condition Book (the partner's), Racing Form (newsprint) —
+      plus `b-modern.html`, B's palette with modern structure (rounded cards,
+      list views, info boxes, stat tiles). Nothing is wired up until Phil picks
+      one; adopting it means a pass over `index.html` and every
+      `app/screens-*.js`.
 - [ ] **Merge `landing-v1-design` to `main`** (2026-08-06). The landing page
       rebuilt on v1's design, with the predictive copy rewritten. All three gates
       pass. Merging publishes it to Pages, so it waits on Phil's go-ahead.

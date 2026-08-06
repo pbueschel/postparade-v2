@@ -4,6 +4,47 @@ Append-only session journal. Newest entry first.
 
 ---
 
+## 2026-08-06 — direction B, modern pass
+
+**What changed.** Phil asked for another pass at B using modern styling and UI
+choices — rounded corners, list views, info boxes — keeping the same colouring.
+Built `docs/mockups/2026-08-06-classic/b-modern.html`, all five screens again.
+
+Every colour value is identical to variant B. The structure is not:
+
+- rounded cards (16px) and controls (9px) replace hairline-ruled panels;
+- **My Horses is a list view**, not a table — round silks avatar, horse and
+  breeding on the left, labelled columns right, one action per row, and it
+  reflows to a single column instead of scrolling sideways;
+- notices became **info boxes** (tinted, iconed, with a bold lead line);
+- the three dashboard panels became **stat tiles** with rounded meters;
+- the tab strip became a **segmented control**; filters became pill chips;
+- condition-book races became individual cards with a fill meter and a footer
+  action, each carrying its own flag info box where one applies;
+- the meets grid became separate cards floating on the parchment ground.
+
+Kept classic on purpose: Source Serif display headings, and monospace confined
+to data that wants to line up — times, money, records, and the condition text,
+which still reads better as a typed book than as UI copy. Body copy moved to
+Inter, which is what makes the whole thing read modern.
+
+Separate file rather than a fourth theme toggle in `index.html`: the difference
+is structural, not token-level, so it could not be expressed as a variant of the
+same markup. The two files cross-link.
+
+**Noted for the decision.** Modern structure costs vertical space — seven horses
+occupy roughly what nine did in the ruled table. If the roster is where trainers
+live, a density toggle on the list view is the fix.
+
+**Verification.** Headless-Chrome dump clean (no `undefined`, `NaN`, `[object`,
+unrendered `${`); screenshotted at 1440px. Fixed a sidebar bug where the brand
+and user names ran into their subtitles (inline spans needed `display:block`).
+
+**What's next / held.** Still mockups — nothing wired to `app/`. Awaiting Phil's
+pick between original B and this pass.
+
+---
+
 ## 2026-08-06 — classic-direction mockups (three variants, five screens)
 
 **What changed.** Phil supplied two screenshots from a partner's brief attempt —
