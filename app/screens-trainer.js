@@ -67,14 +67,17 @@
 
     const tile = (key, label, icon, note) => {
       const active = dashFilter === key;
-      return `<button class="pp-dash-tile card ring-soft p-4 text-left w-full ${active ? 'ring-2 ring-emerald-500' : ''}" data-filter="${key}">
-        <div class="flex items-start justify-between">
-          <div class="text-xs text-ink-500">${esc(label)}</div>
-          <i data-lucide="${icon}" class="w-4 h-4 text-slate-300"></i>
+      const n = key === 'all' ? counts.all : counts[key];
+      const pct = counts.all ? Math.round((n / counts.all) * 100) : 0;
+      return `<button class="pp-dash-tile tile text-left w-full ${active ? 'ring-2 ring-emerald-600' : ''}" data-filter="${key}">
+        <div class="flex items-center gap-2 text-sm text-ink-600">
+          <i data-lucide="${icon}" class="w-4 h-4 text-emerald-500"></i>${esc(label)}
         </div>
-        <div class="mt-1 text-2xl font-semibold tracking-tight">${key === 'all' ? counts.all : counts[key]}</div>
-        <div class="text-[11px] text-ink-500 mt-0.5">${esc(note)}</div>
-        <div class="mt-2 text-[11px] accent-text font-medium">${active ? 'Showing below' : 'Show these'} →</div>
+        <div class="tile-v">${n}</div>
+        <div class="text-xs text-ink-500 mt-1">${esc(note)}</div>
+        <div class="meter mt-3 ${key === 'placement' ? 'meter-gold' : key === 'all' ? 'meter-quiet' : ''}">
+          <span style="width:${pct}%"></span></div>
+        <div class="mt-2.5 text-xs accent-text font-medium">${active ? 'Showing below' : 'Show these'} →</div>
       </button>`;
     };
 
@@ -117,23 +120,9 @@
           </div>
           <a href="#trainer/horses" class="text-xs accent-text hover:underline">Manage roster →</a>
         </div>
-        ${shown.length ? `
-        <div class="overflow-x-auto">
-          <table class="w-full text-sm">
-            <thead class="bg-slate-50 text-[11px] uppercase tracking-wide text-ink-500">
-              <tr>
-                <th class="text-left font-medium px-5 py-2">Horse</th>
-                <th class="text-left font-medium px-3 py-2">Status</th>
-                <th class="text-left font-medium px-3 py-2">Where it stands</th>
-                <th class="text-left font-medium px-3 py-2 hidden md:table-cell">Last start</th>
-                <th class="text-right font-medium px-5 py-2">Find a spot</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-50">
-              ${shown.map((h) => slipRow(h)).join('')}
-            </tbody>
-          </table>
-        </div>` : emptyState('list', 'Nothing in this view', 'Switch the filter above to see other horses.')}
+        ${shown.length
+          ? `<div class="list">${shown.map((h) => slipRow(h)).join('')}</div>`
+          : emptyState('list', 'Nothing in this view', 'Switch the filter above to see other horses.')}
       </div>
 
       <div class="grid lg:grid-cols-2 gap-4">
@@ -165,32 +154,37 @@
     const race = live && PPData.getRace(live.raceId);
     const where = race
       ? `<a href="#race/${esc(race.id)}" class="hover:underline">${esc(raceTitle(race))}</a>
-         <div class="text-[11px] text-ink-500">${esc(raceMetaLine(race))}</div>
-         <div class="text-[10px] text-ink-400 mono">submitted ${esc(fmtStamp(live.submittedAt))}</div>`
+         <div class="text-xs text-ink-500">${esc(raceMetaLine(race))}</div>
+         <div class="text-[11px] text-ink-400 mono mt-0.5">submitted ${esc(fmtStamp(live.submittedAt))}</div>`
       : '<span class="text-ink-500">No open submission</span>';
     const last = h.lastStart
-      ? `${esc(h.lastStart.date)} · ${esc((PPData.getTrack(h.lastStart.trackId) || {}).name || h.lastStart.trackId)}
-         <div class="text-[11px] text-ink-500">finished ${esc(String(h.lastStart.finish))} of ${esc(String(h.lastStart.fieldSize))}</div>`
+      ? `<span class="mono text-[13px]">${esc(h.lastStart.date)}</span> · ${esc((PPData.getTrack(h.lastStart.trackId) || {}).name || h.lastStart.trackId)}
+         <div class="text-xs text-ink-500">finished ${esc(String(h.lastStart.finish))} of ${esc(String(h.lastStart.fieldSize))}</div>`
       : '<span class="text-ink-500">Unraced</span>';
+    /* List row (modern pass): identity left, labelled facts right, one action. */
     return `
-      <tr class="row-hover align-top">
-        <td class="px-5 py-3">
-          <div class="flex items-center gap-2.5">
-            ${horseIcon(h, 'sm')}
-            <div class="min-w-0">
-              ${horseLink(h)}
-              <div class="text-[11px] text-ink-500">${esc(h.age)}yo ${esc(h.sexLabel)} · ${esc(h.color)}</div>
-            </div>
+      <div class="list-row flex-wrap lg:flex-nowrap">
+        <div class="flex items-center gap-3 min-w-0 flex-1">
+          ${horseIcon(h)}
+          <div class="min-w-0">
+            ${horseLink(h)}
+            <div class="text-xs text-ink-500 mt-0.5">${esc(h.age)}yo ${esc(h.sexLabel)} · ${esc(h.color)}</div>
           </div>
-        </td>
-        <td class="px-3 py-3">${statusPill(status)}</td>
-        <td class="px-3 py-3">${where}</td>
-        <td class="px-3 py-3 hidden md:table-cell text-xs">${last}</td>
-        <td class="px-5 py-3 text-right whitespace-nowrap">
-          <a href="#trainer/books?horse=${esc(h.id)}" class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 hover:border-slate-300 hover:bg-slate-50">
+        </div>
+        <div class="flex items-start gap-5 shrink-0">
+          <div class="list-col w-44 pt-0.5">${statusPill(status)}</div>
+          <div class="list-col w-64">
+            <div class="k">Where it stands</div>
+            <div class="v">${where}</div>
+          </div>
+          <div class="list-col w-52 hidden lg:block">
+            <div class="k">Last start</div>
+            <div class="v">${last}</div>
+          </div>
+          <a href="#trainer/books?horse=${esc(h.id)}" class="inline-flex items-center gap-1.5 px-3 py-2 text-[13px] rounded-lg border border-slate-200 bg-white hover:border-slate-300 hover:bg-slate-50 whitespace-nowrap">
             <i data-lucide="book-open" class="w-3.5 h-3.5"></i>Condition books</a>
-        </td>
-      </tr>`;
+        </div>
+      </div>`;
   }
 
   function decisionLine(s) {
@@ -260,42 +254,42 @@
       </div>
 
       <div class="card ring-soft overflow-hidden">
-        <div class="overflow-x-auto">
-          <table class="w-full text-sm">
-            <thead class="bg-slate-50 text-[11px] uppercase tracking-wide text-ink-500">
-              <tr>
-                <th class="text-left font-medium px-5 py-2">Horse</th>
-                <th class="text-left font-medium px-3 py-2">Registration</th>
-                <th class="text-left font-medium px-3 py-2">Record</th>
-                <th class="text-left font-medium px-3 py-2">Status</th>
-                <th class="text-right font-medium px-5 py-2">Actions</th>
-              </tr>
-            </thead>
-            <tbody class="divide-y divide-slate-50">
-              ${list.map((h) => `
-                <tr class="row-hover align-top">
-                  <td class="px-5 py-3">
-                    <div class="flex items-center gap-2.5">${horseIcon(h, 'sm')}
-                      <div>${horseLink(h)}
-                        <div class="text-[11px] text-ink-500">${esc(h.age)}yo ${esc(h.sexLabel)}</div></div></div>
-                  </td>
-                  <td class="px-3 py-3 text-xs text-ink-600">
-                    ${esc(h.color || '—')} · ${esc(h.bred || '—')}-bred · foaled ${esc(String(h.foaled || '—'))}<br>
-                    <span class="text-ink-500">${esc(h.sire || '—')} — ${esc(h.dam || '—')}</span>
-                  </td>
-                  <td class="px-3 py-3 text-xs mono">${esc(h.record.starts)}-${esc(h.record.wins)}-${esc(h.record.seconds)}-${esc(h.record.thirds)}
-                    <div class="text-ink-500">${esc(fmtMoney(h.record.earnings))}</div></td>
-                  <td class="px-3 py-3">${statusPill(PPStore.statusOf(h.id))}
-                    ${h.vetList && h.vetList.listed ? `<div class="mt-1">${pill("Vet's list", 'bg-red-50 text-red-700', 'stethoscope')}</div>` : ''}</td>
-                  <td class="px-5 py-3 text-right whitespace-nowrap">
-                    <a href="#trainer/books?horse=${esc(h.id)}" class="inline-flex items-center gap-1 px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 hover:bg-slate-50">
-                      <i data-lucide="book-open" class="w-3.5 h-3.5"></i>Pursue races</a>
-                    <button class="pp-remove-horse ml-1 inline-flex items-center gap-1 px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 text-red-700 hover:bg-red-50" data-horse-id="${esc(h.id)}">
-                      <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>Remove</button>
-                  </td>
-                </tr>`).join('')}
-            </tbody>
-          </table>
+        <div class="list">
+          ${list.map((h) => `
+            <div class="list-row flex-wrap lg:flex-nowrap">
+              <div class="flex items-center gap-3 min-w-0 flex-1">
+                ${horseIcon(h)}
+                <div class="min-w-0">
+                  ${horseLink(h)}
+                  <div class="text-xs text-ink-500 mt-0.5">
+                    ${esc(h.age)}yo ${esc(h.sexLabel)} · ${esc(h.color || '—')} · ${esc(h.bred || '—')}-bred ·
+                    foaled ${esc(String(h.foaled || '—'))}
+                  </div>
+                  <div class="text-xs text-ink-400">${esc(h.sire || '—')} — ${esc(h.dam || '—')}</div>
+                </div>
+              </div>
+              <div class="flex items-center gap-5 shrink-0">
+                <div class="list-col w-40 hidden md:block">
+                  <div class="k">Record</div>
+                  <div class="v mono">${esc(h.record.starts)} sts · ${esc(h.record.wins)}–${esc(h.record.seconds)}–${esc(h.record.thirds)}</div>
+                </div>
+                <div class="list-col w-28 hidden md:block">
+                  <div class="k">Earnings</div>
+                  <div class="v mono">${esc(fmtMoney(h.record.earnings))}</div>
+                </div>
+                <div class="list-col w-48">
+                  <div class="k">Status</div>
+                  <div class="v">${statusPill(PPStore.statusOf(h.id))}
+                    ${h.vetList && h.vetList.listed ? pill("Vet's list", 'bg-red-50 text-red-700', 'stethoscope') : ''}</div>
+                </div>
+                <div class="flex items-center gap-2 whitespace-nowrap">
+                  <a href="#trainer/books?horse=${esc(h.id)}" class="inline-flex items-center gap-1.5 px-3 py-2 text-[13px] rounded-lg border border-slate-200 bg-white hover:bg-slate-50">
+                    <i data-lucide="book-open" class="w-3.5 h-3.5"></i>Pursue races</a>
+                  <button class="pp-remove-horse inline-flex items-center gap-1.5 px-3 py-2 text-[13px] rounded-lg border border-slate-200 bg-white text-red-700 hover:bg-red-50" data-horse-id="${esc(h.id)}">
+                    <i data-lucide="trash-2" class="w-3.5 h-3.5"></i>Remove</button>
+                </div>
+              </div>
+            </div>`).join('')}
         </div>
       </div>`;
   };
@@ -480,25 +474,29 @@
     const res = horse ? check(horse, race) : null;
     const existing = horse && PPStore.listSubmissions({ horseId: horse.id, raceId: race.id })[0];
     const t = trackOf(race);
+    /* Race card (modern pass): number badge, serif title, facts as pills, the
+       fill meter on the right, condition text in its box, and the check as an
+       info box. Class hooks (pp-toggle-conditions / pp-watch / pp-open-submit)
+       are unchanged — the delegated listeners below still own the behaviour. */
     return `
       <div class="card ring-soft overflow-hidden" id="race-card-${esc(race.id)}">
         <div class="p-5">
-          <div class="flex flex-wrap items-start justify-between gap-3">
-            <div class="min-w-0">
-              <div class="flex flex-wrap items-center gap-2">
-                <a href="#race/${esc(race.id)}" class="font-semibold hover:underline">Race ${esc(race.raceNumber)}${race.name ? ' — ' + esc(race.name) : ''}</a>
-                ${pill(race.typeLabel, 'bg-slate-100 text-slate-700')}
+          <div class="flex flex-wrap items-start gap-4">
+            <span class="w-11 h-11 rounded-xl bg-emerald-50 text-emerald-800 border border-emerald-100 flex items-center justify-center serif text-xl font-bold shrink-0">
+              ${esc(race.raceNumber)}</span>
+            <div class="min-w-0 flex-1">
+              <a href="#race/${esc(race.id)}" class="serif text-lg font-semibold hover:underline">${race.name ? esc(race.name) : esc(race.typeLabel)}</a>
+              <div class="flex flex-wrap items-center gap-1.5 mt-2">
+                ${race.name ? pill(race.typeLabel, 'bg-slate-100 text-slate-700') : ''}
                 ${surfacePill(race.surface)}
+                ${pill(fmtDistance(race.distanceYards, horseRegistryOfRace(race)), 'bg-slate-100 text-slate-700')}
+                ${pill('Purse ' + fmtMoney(race.purse), 'bg-slate-100 text-slate-700')}
                 ${race.extra ? pill('Extra race', 'bg-violet-50 text-violet-700', 'plus-circle') : ''}
                 ${race.mtoAllowed ? pill('MTO permitted', 'bg-sky-50 text-sky-700') : ''}
               </div>
-              <div class="text-xs text-ink-500 mt-1">${esc(raceWhere(race))}</div>
-              <div class="text-sm mt-2 flex flex-wrap gap-x-4 gap-y-1">
-                <span><span class="text-ink-500">Purse</span> <strong>${esc(fmtMoney(race.purse))}</strong></span>
-                <span><span class="text-ink-500">Distance</span> ${esc(fmtDistance(race.distanceYards, horseRegistryOfRace(race)))}</span>
-                <span><span class="text-ink-500">Post</span> ${esc(fmtStamp(race.postTime))}</span>
-                <span><span class="text-ink-500">Entries close</span> ${esc(fmtStamp(race.entryClose))}</span>
-              </div>
+              <div class="text-xs text-ink-500 mt-2">${esc(raceWhere(race))}</div>
+              <div class="text-xs text-ink-500 mono mt-1">
+                post ${esc(fmtStamp(race.postTime))} · entries close ${esc(fmtStamp(race.entryClose))}</div>
             </div>
             <div class="flex flex-col items-end gap-2">
               ${closePill(race.entryClose)}
@@ -507,41 +505,41 @@
           </div>
 
           ${res ? `
-            <div class="mt-4 rounded-xl border ${res.eligible ? 'border-emerald-100 bg-emerald-50/40' : 'border-red-100 bg-red-50/40'} p-3.5">
-              <div class="flex flex-wrap items-center gap-2">
-                <i data-lucide="${res.eligible ? 'check-circle-2' : 'alert-triangle'}" class="w-4 h-4 ${res.eligible ? 'text-emerald-600' : 'text-red-600'}"></i>
-                <span class="text-sm font-medium">${res.eligible
+            <div class="mt-4 info ${res.eligible ? 'info-accent' : 'info-alarm'}">
+              <i data-lucide="${res.eligible ? 'check-circle-2' : 'alert-triangle'}" class="w-4 h-4"></i>
+              <div class="min-w-0">
+                <b>${res.eligible
                   ? esc(horse.name) + ' meets the written conditions'
-                  : esc(horse.name) + ' has ' + res.hardConflicts.length + ' condition conflict' + (res.hardConflicts.length === 1 ? '' : 's')}</span>
-                <span class="text-[11px] text-ink-500">condition check only — never a judgement about how the horse will run</span>
+                  : esc(horse.name) + ' has ' + res.hardConflicts.length + ' condition conflict' + (res.hardConflicts.length === 1 ? '' : 's')}</b>
+                <span class="text-[11px] opacity-80">Condition check only — never a judgement about how the horse will run.</span>
+                ${res.conflicts.length ? `<div class="mt-2 flex flex-wrap gap-1.5">${res.conflicts.map(conflictChip).join('')}</div>
+                  <ul class="mt-2 space-y-1">${res.conflicts.map((c) => `<li class="text-xs ${c.severity === 'hard' ? 'text-red-700' : 'text-amber-700'}">${esc(c.detail)}</li>`).join('')}</ul>` : ''}
+                ${res.preferences.length ? res.preferences.map((p) => `
+                  <div class="mt-2 text-xs ${p.met ? 'text-emerald-800' : p.verified ? 'text-ink-600' : 'text-amber-700'}">
+                    <strong>${esc(p.label)}</strong> — ${p.met ? 'applies' : p.verified ? 'does not apply' : 'cannot be settled from the record here'}. ${esc(p.detail)}
+                  </div>`).join('') : ''}
               </div>
-              ${res.conflicts.length ? `<div class="mt-2 flex flex-wrap gap-1.5">${res.conflicts.map(conflictChip).join('')}</div>
-                <ul class="mt-2 space-y-1">${res.conflicts.map((c) => `<li class="text-xs ${c.severity === 'hard' ? 'text-red-700' : 'text-amber-700'}">${esc(c.detail)}</li>`).join('')}</ul>` : ''}
-              ${res.preferences.length ? res.preferences.map((p) => `
-                <div class="mt-2 text-xs ${p.met ? 'text-emerald-800' : p.verified ? 'text-ink-600' : 'text-amber-700'}">
-                  <strong>${esc(p.label)}</strong> — ${p.met ? 'applies' : p.verified ? 'does not apply' : 'cannot be settled from the record here'}. ${esc(p.detail)}
-                </div>`).join('') : ''}
             </div>` : ''}
 
-          <div class="mt-4 flex flex-wrap items-center gap-2">
-            <button class="pp-toggle-conditions inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 hover:bg-slate-50" data-race-id="${esc(race.id)}">
-              <i data-lucide="file-text" class="w-3.5 h-3.5"></i>Conditions as written</button>
-            <button class="pp-watch inline-flex items-center gap-1.5 px-2.5 py-1.5 text-xs rounded-lg border border-slate-200 hover:bg-slate-50" data-race-id="${esc(race.id)}">
-              <i data-lucide="${PPStore.isWatched(race.id) ? 'bell-ring' : 'bell'}" class="w-3.5 h-3.5"></i>${PPStore.isWatched(race.id) ? 'Watching entry window' : 'Watch entry window'}</button>
-            <div class="flex-1"></div>
-            ${existing && existing.status !== 'declined' && existing.status !== 'withdrawn' ? `
-              <span class="text-xs text-ink-500">Submitted ${esc(fmtStamp(existing.submittedAt))}</span>
-              ${statusPill(existing.status)}`
-              : horse ? `
-              <button class="pp-open-submit inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg ${res.eligible ? 'accent-bg accent-bg-h text-white' : 'border border-amber-300 text-amber-800 bg-amber-50 hover:bg-amber-100'}"
-                data-race-id="${esc(race.id)}" data-horse-id="${esc(horse.id)}">
-                <i data-lucide="${res.eligible ? 'send' : 'alert-triangle'}" class="w-4 h-4"></i>${res.eligible ? 'Submit ' + esc(horse.name) : 'Submit anyway'}</button>`
-              : `
-              <button class="pp-open-submit inline-flex items-center gap-1.5 px-3 py-1.5 text-sm rounded-lg accent-bg accent-bg-h text-white" data-race-id="${esc(race.id)}">
-                <i data-lucide="send" class="w-4 h-4"></i>Submit a horse</button>`}
-          </div>
         </div>
-        <div id="cond-${esc(race.id)}" class="hidden border-t border-slate-100 bg-slate-50 p-5">
+        <div class="flex flex-wrap items-center gap-2 px-5 py-3.5 bg-slate-50 border-t border-slate-200">
+          <button class="pp-toggle-conditions inline-flex items-center gap-1.5 px-3 py-2 text-[13px] rounded-lg border border-slate-200 bg-white hover:bg-slate-100" data-race-id="${esc(race.id)}">
+            <i data-lucide="file-text" class="w-3.5 h-3.5"></i>Conditions as written</button>
+          <button class="pp-watch inline-flex items-center gap-1.5 px-3 py-2 text-[13px] rounded-lg border border-slate-200 bg-white hover:bg-slate-100" data-race-id="${esc(race.id)}">
+            <i data-lucide="${PPStore.isWatched(race.id) ? 'bell-ring' : 'bell'}" class="w-3.5 h-3.5"></i>${PPStore.isWatched(race.id) ? 'Watching entry window' : 'Watch entry window'}</button>
+          <div class="flex-1"></div>
+          ${existing && existing.status !== 'declined' && existing.status !== 'withdrawn' ? `
+            <span class="text-xs text-ink-500">Submitted ${esc(fmtStamp(existing.submittedAt))}</span>
+            ${statusPill(existing.status)}`
+            : horse ? `
+            <button class="pp-open-submit inline-flex items-center gap-1.5 px-4 py-2 text-sm rounded-lg ${res.eligible ? 'accent-bg accent-bg-h text-white' : 'border border-amber-300 text-amber-800 bg-amber-50 hover:bg-amber-100'}"
+              data-race-id="${esc(race.id)}" data-horse-id="${esc(horse.id)}">
+              <i data-lucide="${res.eligible ? 'send' : 'alert-triangle'}" class="w-4 h-4"></i>${res.eligible ? 'Submit ' + esc(horse.name) : 'Submit anyway'}</button>`
+            : `
+            <button class="pp-open-submit inline-flex items-center gap-1.5 px-4 py-2 text-sm rounded-lg accent-bg accent-bg-h text-white" data-race-id="${esc(race.id)}">
+              <i data-lucide="send" class="w-4 h-4"></i>Submit a horse</button>`}
+        </div>
+        <div id="cond-${esc(race.id)}" class="hidden border-t border-slate-200 bg-slate-50 p-5">
           ${conditionsPanel(race)}
         </div>
       </div>`;
@@ -1137,14 +1135,22 @@
         </select></label>
 
       ${res ? `
-        <div class="mt-3 rounded-xl border ${res.eligible ? 'border-emerald-100 bg-emerald-50/50' : 'border-red-100 bg-red-50/50'} p-3.5">
-          <div class="flex items-center gap-2">
-            <i data-lucide="${res.eligible ? 'check-circle-2' : 'alert-triangle'}" class="w-4 h-4 ${res.eligible ? 'text-emerald-600' : 'text-red-600'}"></i>
-            <span class="text-sm font-medium">${res.eligible ? 'Meets the written conditions' : 'Condition conflict flagged'}</span>
+        <div class="mt-3">
+          <div class="info ${res.eligible ? 'info-accent' : 'info-alarm'}">
+            <i data-lucide="${res.eligible ? 'check-circle-2' : 'alert-triangle'}" class="w-4 h-4"></i>
+            <div><b>${res.eligible ? 'Meets the written conditions' : 'Condition conflict flagged'}</b>
+              <span>Eligibility only. Whether the horse draws in is the racing office's call.</span></div>
           </div>
-          ${res.conflicts.length ? `<ul class="mt-2 space-y-1.5">${res.conflicts.map((c) => `
-            <li class="text-xs ${c.severity === 'hard' ? 'text-red-700' : 'text-amber-700'}"><strong>${esc(c.label)}.</strong> ${esc(c.detail)}</li>`).join('')}</ul>` : ''}
-          ${res.preferences.map((p) => `<div class="mt-2 text-xs text-ink-600"><strong>${esc(p.label)}</strong> — ${esc(p.detail)}</div>`).join('')}
+          ${res.conflicts.length ? `<div class="mt-2.5">${res.conflicts.map((c) => `
+            <div class="checkrow ${c.severity === 'hard' ? 'hard' : 'flag'}">
+              <span class="mk"><i data-lucide="alert-triangle" class="w-3 h-3"></i></span>
+              <span class="text-sm">${esc(c.detail)}<span class="cl">${esc(c.label).toUpperCase()}</span></span>
+            </div>`).join('')}</div>` : ''}
+          ${res.preferences.length ? `<div class="mt-2.5">${res.preferences.map((p) => `
+            <div class="checkrow ${p.met ? '' : 'flag'}">
+              <span class="mk"><i data-lucide="${p.met ? 'check' : 'alert-triangle'}" class="w-3 h-3"></i></span>
+              <span class="text-sm">${esc(p.detail)}<span class="cl">${esc(p.label).toUpperCase()}</span></span>
+            </div>`).join('')}</div>` : ''}
           ${res.notices.length ? `<ul class="mt-2 space-y-1">${res.notices.map((n) => `<li class="text-[11px] text-ink-500">${esc(n.label)}: ${esc(n.detail)}</li>`).join('')}</ul>` : ''}
         </div>` : ''}
 

@@ -4,6 +4,61 @@ Append-only session journal. Newest entry first.
 
 ---
 
+## 2026-08-06 — direction B (modern pass) adopted across the product
+
+**What changed.** Phil picked the modern pass. Implemented it in the real build:
+`index.html`, `app.html`, and the screen renderers.
+
+**How it is wired** — the decision that made this tractable. `app.html` now
+**remaps the built-in Tailwind scales** (`slate`, `emerald`, `amber`, `red`,
+`indigo`, plus the horse-tint colours) onto the parchment/forest palette rather
+than replacing them, so the utility classes already spread across ~2,000 lines
+of screen renderers carried the new palette with no markup churn. Shape and
+typography then come from a component layer in `app.html`'s `<style>`: `.card`,
+`.tile`/`.tile-v`, `.list`/`.list-row`/`.list-col`, `.info` (+`-accent`,
+`-alarm`), `.checkrow` (+`.flag`, `.hard`), `.meter`, `.seg`, `.chip`,
+`.cond-text`. Documented in `CLAUDE.md` — keep the ramp direction (50 lightest,
+900 darkest) or every screen shifts at once.
+
+Structural work, screen by screen:
+
+- **Chrome** — dark forest sidebar, pill search, rounded bell and CTA.
+- **Trainer dashboard** — stat tiles with serif numerals and meters (the filter
+  buttons kept their `pp-dash-tile`/`data-filter` hooks); horse slip is a list.
+- **My Horses** — list view, round silks avatars, fixed-width labelled columns.
+  Widths are pinned deliberately: content-sized columns did not align row to row.
+- **Condition book** — each race is a card: number badge, serif title, facts as
+  pills, fill meter, footer action bar.
+- **Condition checks** — `.checkrow` rows plus info boxes, in the submission
+  modal, the book's race cards, and the office's entry-request queue.
+- **Track dashboard** — stat tiles; declines are oxblood info boxes.
+- **`index.html`** — regenerated in one pass, self-contained, palette by hand.
+
+New helpers in `app/render.js`: `infoBox()`, `statTile()`; `spotsBar()` now
+emits the rounded meter; `horseIcon()` is a round avatar; `emptyState()` and the
+modal were restyled.
+
+**Left alone on purpose.** The past-performances, entry-windows, and
+activity-log tables stay tables — they are genuinely tabular and a list view
+would read worse. They inherit the palette regardless.
+
+**Verification.** `bun test/conditions-smoke.js` 48/48 · `bun test/app-smoke.js`
+178/178 (Rule 0 guards intact) · `sh test/render-check.sh` **26/26 routes
+clean**. An earlier render-check run was stopped and re-run from scratch — it
+had been started while files were still being edited, which would have made the
+result meaningless.
+
+**Gotcha worth remembering.** Screenshotting `app.html#<route>` shows the page
+scrolled past the demo banner and topbar, because the fragment scrolls the
+`<section id="…">` into view. Not a rendering bug — screenshot `app.html` with
+no hash to see the chrome. `sips --cropOffset` also does not crop where you
+expect; do not use it to locate regions.
+
+**What's next / held.** On `landing-v1-design`, **not merged**. Merging
+publishes to Pages and needs Phil's go-ahead.
+
+---
+
 ## 2026-08-06 — direction B, modern pass
 
 **What changed.** Phil asked for another pass at B using modern styling and UI

@@ -31,16 +31,15 @@ Date: 2026-07-29.
 Phil authorised publishing this build (repo created, Pages enabled) at the start
 of the 2026-07-29 session, so the site itself is **not** held. What remains held:
 
-- [ ] **Pick a classic direction** (2026-08-06). Three variants across all five
-      screens in `docs/mockups/2026-08-06-classic/index.html` — Paddock
-      (restrained), Condition Book (the partner's), Racing Form (newsprint) —
-      plus `b-modern.html`, B's palette with modern structure (rounded cards,
-      list views, info boxes, stat tiles). Nothing is wired up until Phil picks
-      one; adopting it means a pass over `index.html` and every
-      `app/screens-*.js`.
-- [ ] **Merge `landing-v1-design` to `main`** (2026-08-06). The landing page
-      rebuilt on v1's design, with the predictive copy rewritten. All three gates
-      pass. Merging publishes it to Pages, so it waits on Phil's go-ahead.
+- [x] ~~Pick a classic direction~~ — Phil chose **B, modern pass** (2026-08-06)
+      and it is now implemented across the product. Mockups kept for reference in
+      `docs/mockups/2026-08-06-classic/`.
+- [ ] **Merge `landing-v1-design` to `main`** (2026-08-06). Carries two things:
+      the landing rebuilt on v1's design with the predictive copy rewritten, and
+      **direction B (modern pass) adopted across the whole product** — landing,
+      app chrome, and every screen renderer. All three gates pass (48/48,
+      178/178, 26/26 routes). Merging publishes to Pages, so it waits on Phil's
+      go-ahead. Worth renaming the branch on merge — it outgrew its name.
 - [ ] **Client/investor walkthrough of v2** — the v1 repo's Held walkthrough
       guide should be re-cut against this build before it goes anywhere outward.
       Do not produce or send outward-facing v2 materials without explicit
