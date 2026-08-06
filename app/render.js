@@ -112,19 +112,43 @@ function closePill(iso) {
   return pill('Closes in ' + fmtCountdown(iso), 'bg-slate-100 text-slate-600', 'clock');
 }
 
-/* Spots: openings left vs spots filled. Both sides see this identically. */
+/* Spots: openings left vs spots filled. Both sides see this identically.
+   Rounded meter (direction B, modern pass) — the fill colour still ramps as
+   the race fills, which is a fact about spots, not a forecast. */
 function spotsBar(s) {
   const pct = s.spots ? Math.min(100, Math.round(s.filled / s.spots * 100)) : 0;
-  const bar = s.full ? 'bg-slate-400' : s.open <= 2 ? 'bg-amber-500' : 'bg-emerald-500';
+  const tone = s.full ? 'meter-quiet' : s.open <= 2 ? 'meter-gold' : '';
   return `
     <div class="min-w-[9rem]">
-      <div class="flex items-center justify-between text-[11px] mb-1">
-        <span class="font-medium text-ink-900">${s.filled} of ${s.spots} spots</span>
-        <span class="${s.full ? 'text-slate-500' : 'text-emerald-700'}">${s.full ? 'No openings' : s.open + ' open'}</span>
+      <div class="flex items-center justify-between text-xs mb-1.5">
+        <span class="mono text-ink-900">${s.filled} of ${s.spots} spots</span>
+        <span class="${s.full ? 'text-ink-500' : 'text-emerald-700'}">${s.full ? 'No openings' : s.open + ' open'}</span>
       </div>
-      <div class="h-1.5 rounded-full bg-slate-100 overflow-hidden"><div class="h-full ${bar}" style="width:${pct}%"></div></div>
-      ${s.ae || s.pending ? `<div class="text-[10px] text-ink-500 mt-1">${s.ae ? s.ae + ' also-eligible · ' : ''}${s.pending ? s.pending + ' awaiting review' : ''}</div>` : ''}
+      <div class="meter ${tone}"><span style="width:${pct}%"></span></div>
+      ${s.ae || s.pending ? `<div class="text-[11px] text-ink-500 mt-1.5">${s.ae ? s.ae + ' also-eligible · ' : ''}${s.pending ? s.pending + ' awaiting review' : ''}</div>` : ''}
     </div>`;
+}
+
+/* Info box. The modern pass replaces bare notice lines with these — a bold
+   lead, then the detail. Tone: '' (gold/advisory), 'accent', 'alarm'. */
+function infoBox(lead, body, tone = '', icon = 'alert-triangle') {
+  const cls = tone === 'accent' ? 'info info-accent' : tone === 'alarm' ? 'info info-alarm' : 'info';
+  return `<div class="${cls}">
+    <i data-lucide="${esc(icon)}" class="w-4 h-4"></i>
+    <div><b>${esc(lead)}</b><span>${esc(body)}</span></div>
+  </div>`;
+}
+
+/* Stat tile — label, big serif number, sub-line, optional meter. */
+function statTile(label, value, sub, icon = 'circle', pct = null, tone = '') {
+  return `<div class="tile">
+    <div class="flex items-center gap-2 text-sm text-ink-600">
+      <i data-lucide="${esc(icon)}" class="w-4 h-4 text-emerald-500"></i>${esc(label)}
+    </div>
+    <div class="tile-v">${esc(value)}</div>
+    ${sub ? `<div class="text-xs text-ink-500 mt-1">${esc(sub)}</div>` : ''}
+    ${pct === null ? '' : `<div class="meter ${tone} mt-3"><span style="width:${Math.max(0, Math.min(100, pct))}%"></span></div>`}
+  </div>`;
 }
 
 /* Per-horse identity icon — every horse profile has its own. */
@@ -143,7 +167,7 @@ function horseIcon(h, size = 'md') {
   const cls = TINT_CLASSES[h.tint] || TINT_CLASSES.emerald;
   const dim = size === 'lg' ? 'w-12 h-12' : size === 'sm' ? 'w-7 h-7' : 'w-9 h-9';
   const ic = size === 'lg' ? 'w-6 h-6' : size === 'sm' ? 'w-3.5 h-3.5' : 'w-4 h-4';
-  return `<span class="${dim} shrink-0 rounded-xl border ${cls} flex items-center justify-center" title="${esc(h.name)}">
+  return `<span class="${dim} shrink-0 rounded-full border ${cls} flex items-center justify-center" title="${esc(h.name)}">
     <i data-lucide="${esc(h.icon || 'rabbit')}" class="${ic}"></i></span>`;
 }
 
@@ -151,7 +175,7 @@ function horseIcon(h, size = 'md') {
    (v1 hid this behind a hover affordance that did not fire on placed horses.) */
 function horseLink(h, extraCls = '') {
   if (!h) return '';
-  return `<a href="#horse/${esc(h.id)}" class="horse-link font-medium text-ink-900 underline decoration-slate-300 decoration-1 underline-offset-2 hover:decoration-emerald-500 hover:text-emerald-700 ${extraCls}">${esc(h.name)}</a>`;
+  return `<a href="#horse/${esc(h.id)}" class="horse-link serif font-semibold text-ink-900 underline decoration-slate-300 decoration-1 underline-offset-2 hover:decoration-emerald-500 hover:text-emerald-700 ${extraCls}">${esc(h.name)}</a>`;
 }
 
 /* Conflict chip from a PPConditions.check() conflict. */
@@ -166,7 +190,7 @@ function toast(msg, icon = 'check-circle-2') {
   if (!t) {
     t = document.createElement('div');
     t.id = 'pp-toast';
-    t.className = 'fixed bottom-5 left-1/2 -translate-x-1/2 z-[80] px-4 py-2.5 rounded-lg bg-ink-900 text-white text-sm shadow-lg flex items-center gap-2 transition-opacity duration-300';
+    t.className = 'fixed bottom-5 left-1/2 -translate-x-1/2 z-[80] px-4 py-2.5 rounded-xl bg-ink-900 text-white text-sm shadow-lg flex items-center gap-2 transition-opacity duration-300';
     document.body.appendChild(t);
   }
   t.innerHTML = `<i data-lucide="${icon}" class="w-4 h-4 text-emerald-300"></i><span>${esc(msg)}</span>`;
@@ -186,8 +210,8 @@ function openModal(html) {
     document.body.appendChild(host);
   }
   host.innerHTML = `
-    <div class="absolute inset-0 bg-ink-900/40" data-modal-close></div>
-    <div class="relative mx-auto my-8 w-[min(38rem,92vw)] max-h-[86vh] overflow-y-auto scrollbar-thin card ring-soft p-5">${html}</div>`;
+    <div class="absolute inset-0 bg-ink-900/45" data-modal-close></div>
+    <div class="relative mx-auto my-8 w-[min(38rem,92vw)] max-h-[86vh] overflow-y-auto scrollbar-thin card p-6" style="box-shadow:var(--sh-lg)">${html}</div>`;
   host.classList.remove('hidden');
   if (window.lucide) lucide.createIcons();
 }
@@ -197,9 +221,11 @@ function closeModal() {
 }
 
 function emptyState(icon, title, body) {
-  return `<div class="card ring-soft p-8 text-center">
-    <i data-lucide="${icon}" class="w-6 h-6 mx-auto text-slate-300"></i>
-    <div class="mt-2 font-medium text-ink-900">${esc(title)}</div>
+  return `<div class="card ring-soft p-10 text-center">
+    <span class="w-11 h-11 rounded-full bg-slate-100 border border-slate-200 mx-auto flex items-center justify-center">
+      <i data-lucide="${icon}" class="w-5 h-5 text-ink-400"></i>
+    </span>
+    <div class="mt-3 serif text-lg font-semibold text-ink-900">${esc(title)}</div>
     <div class="text-sm text-ink-500 mt-1">${esc(body)}</div>
   </div>`;
 }

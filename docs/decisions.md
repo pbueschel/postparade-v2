@@ -4,6 +4,52 @@ Append-only. Newest first. Each entry: the decision, why, and what it rules out.
 
 ---
 
+## 2026-08-06 — direction B (modern pass) is the product's visual identity
+
+**Decision.** Parchment ground, forest-green chrome, gold advisory, oxblood
+declines; rounded cards, list views, info boxes, stat tiles. Serif display
+headings; monospace confined to data that lines up — times, money, records, and
+condition text. Everything else Inter.
+
+**Why.** Phil's partner supplied a racing-form treatment; three variants were
+mocked and this pass — B's colour with modern structure — was chosen. It reads
+as a racing product without the newsprint density that variant C could not have
+held consistently once real data varied row heights.
+
+**How, and what it rules out.** The Tailwind scales are **remapped, not
+replaced**, so the palette reaches every existing utility class. That is what
+made a whole-product restyle affordable — and it means **the scales can no
+longer be used for their literal colours**: `red` is oxblood, `emerald` is
+forest, `amber` is gold, `indigo` is slate blue. Anyone wanting a true red must
+add a new token, not reach for `red-500`. Keep the ramp direction intact.
+
+**Also rules out.** A second source of truth for colour. `index.html` is
+self-contained (no Tailwind) and repeats the palette by hand — a colour change
+has to be made in both files.
+
+**Cost accepted.** List views cost vertical space against the old dense tables.
+If the roster becomes the screen trainers live in, the fix is a density toggle,
+not a return to tables.
+
+## 2026-08-06 — the landing page carries v1's design, not v1's copy
+
+**Decision.** v2's landing reproduces v1's layout and visual language section
+for section, but every predictive claim is rewritten. The v1→v2 diff table, the
+"Still open" callout, and "About the data" stay.
+
+**Why.** Phil wants the two sites to read as one product rather than two
+unrelated pages. v1's copy cannot come along: it sells the recommendation
+engine v2 removed, and `index.html` is inside the Rule 0 guard list in
+`test/app-smoke.js`. Design continuity was the part worth keeping.
+
+**Rules out.** Copying v1's `index.html` verbatim, and loosening the guard to
+let it through. Also rules out marketing an owner workspace — v2 has trainer
+and racing-office workspaces only, so that column became "The record".
+
+**Cost.** The design is reimplemented in hand-written CSS with an inline SVG
+sprite, not Tailwind + lucide, because v2's `index.html` must stay
+self-contained. A future change to the shared look must be made twice.
+
 ## 2026-07-29 — v2 is a separate repo and a separate Pages site
 
 **Decision.** Build the revision as `postparade-v2` with its own GitHub Pages

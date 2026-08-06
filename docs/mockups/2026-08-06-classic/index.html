@@ -1,0 +1,1298 @@
+<!doctype html>
+<html lang="en" data-variant="b">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PostParade — classic direction mockups</title>
+<meta name="description" content="Three classic visual directions for PostParade v2, applied to the landing page, trainer dashboard, My Horses, a condition book, and a race detail.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=JetBrains+Mono:wght@400;500;700&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+/* ==========================================================================
+   PostParade — classic-direction mockups (2026-08-06)
+
+   STATIC MOCKUPS. Not wired to app/, not part of the build, no gates run
+   against this file. Data shown is the real v2 seed (Kinnon LaRose's roster,
+   Ellis Park's book) so the density is honest.
+
+   One markup, three themes. Everything that differs between directions is a
+   custom property or a [data-variant] rule, so the same five screens can be
+   compared like for like:
+
+     A · Paddock        — current v2 palette, classic typography only
+     B · Condition Book — parchment ground, forest-green chrome (the partner's)
+     C · Racing Form    — newsprint density, ruled tables, no round corners
+
+   Rule 0 holds here too: nothing on these screens rates, ranks, or forecasts.
+   ========================================================================== */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+/* ---- shared type stacks ------------------------------------------------- */
+:root {
+  --serif: 'Source Serif 4', 'Iowan Old Style', 'Palatino Linotype', Palatino, Georgia, serif;
+  --mono: 'JetBrains Mono', ui-monospace, 'SFMono-Regular', Menlo, monospace;
+  --sans: Inter, system-ui, -apple-system, sans-serif;
+}
+
+/* ---- A · Paddock -------------------------------------------------------- */
+[data-variant="a"] {
+  --ground: #fbfaf7; --panel: #ffffff; --panel-2: #fafbfc;
+  --ink: #0b1220; --ink-2: #475569; --ink-3: #94a3b8;
+  --rule: #e4e2db; --rule-strong: #cfccc2;
+  --chrome: #ffffff; --chrome-ink: #0b1220; --chrome-ink-2: #64748b;
+  --chrome-rule: #e4e2db; --chrome-active: #ecfdf5; --chrome-active-ink: #047857;
+  --accent: #047857; --accent-2: #059669; --accent-soft: #ecfdf5;
+  --second: #4f46e5; --second-soft: #eef2ff;
+  --gold: #b45309; --gold-soft: #fffbeb;
+  --alarm: #9f1239; --alarm-ink: #ffffff; --alarm-soft: #fff1f2;
+  --head-fill: #ffffff; --head-ink: #0b1220; --head-rule: 1px solid var(--rule);
+  --radius: 5px; --border: 1px; --shadow: 0 1px 2px rgba(15,23,42,.05);
+  --body-font: var(--sans); --body-size: 14.5px;
+  --display-font: var(--serif);
+  --row-pad: 13px; --panel-pad: 20px;
+  --label-space: .14em;
+}
+/* ---- B · Condition Book ------------------------------------------------- */
+[data-variant="b"] {
+  --ground: #f2efe6; --panel: #fffdf8; --panel-2: #f7f4ea;
+  --ink: #1d2620; --ink-2: #55605a; --ink-3: #8b948d;
+  --rule: #ddd6c4; --rule-strong: #c2b9a2;
+  --chrome: #24402f; --chrome-ink: #eee9dc; --chrome-ink-2: #9db3a5;
+  --chrome-rule: #35513f; --chrome-active: #1a3123; --chrome-active-ink: #ffffff;
+  --accent: #24402f; --accent-2: #386b4c; --accent-soft: #e6ede7;
+  --second: #2f4858; --second-soft: #e8eef2;
+  --gold: #96701f; --gold-soft: #f7f0dc;
+  --alarm: #7b2418; --alarm-ink: #f6ece4; --alarm-soft: #f8ece7;
+  --head-fill: #24402f; --head-ink: #eee9dc; --head-rule: 1px solid var(--rule);
+  --radius: 3px; --border: 1px; --shadow: 0 1px 0 rgba(29,38,32,.06);
+  --body-font: var(--serif); --body-size: 15.5px;
+  --display-font: var(--serif);
+  --row-pad: 13px; --panel-pad: 20px;
+  --label-space: .16em;
+}
+/* ---- C · Racing Form ---------------------------------------------------- */
+[data-variant="c"] {
+  --ground: #e7e1d1; --panel: #f6f2e6; --panel-2: #ece6d5;
+  --ink: #141a15; --ink-2: #4a5049; --ink-3: #7c8179;
+  --rule: #b9b19b; --rule-strong: #141a15;
+  --chrome: #16211a; --chrome-ink: #e3ddcb; --chrome-ink-2: #94a396;
+  --chrome-rule: #2b3a2f; --chrome-active: #0b120d; --chrome-active-ink: #e8c66a;
+  --accent: #16211a; --accent-2: #2f4a37; --accent-soft: #dfe3d8;
+  --second: #2b3a44; --second-soft: #dde3e6;
+  --gold: #8a6a15; --gold-soft: #eee3c4;
+  --alarm: #6d1f12; --alarm-ink: #f0e4d8; --alarm-soft: #e9dccf;
+  --head-fill: #16211a; --head-ink: #e8c66a; --head-rule: 2px solid var(--rule-strong);
+  --radius: 0px; --border: 1px; --shadow: none;
+  --body-font: var(--serif); --body-size: 15px;
+  --display-font: var(--serif);
+  --row-pad: 9px; --panel-pad: 16px;
+  --label-space: .2em;
+}
+
+body {
+  margin: 0; background: var(--ground); color: var(--ink);
+  font-family: var(--body-font); font-size: var(--body-size); line-height: 1.5;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+h1, h2, h3, h4 { font-family: var(--display-font); font-weight: 600; margin: 0; letter-spacing: -.01em; }
+[data-variant="c"] h1, [data-variant="c"] h2 { letter-spacing: -.02em; }
+
+/* ---- primitives --------------------------------------------------------- */
+.mono { font-family: var(--mono); }
+.label {
+  font-family: var(--mono); font-size: 10.5px; font-weight: 500;
+  text-transform: uppercase; letter-spacing: var(--label-space); color: var(--ink-3);
+}
+.num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+.panel {
+  background: var(--panel); border: var(--border) solid var(--rule);
+  border-radius: var(--radius); box-shadow: var(--shadow);
+}
+[data-variant="c"] .panel { border-color: var(--rule-strong); }
+
+.panel-head {
+  display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  background: var(--head-fill); color: var(--head-ink);
+  padding: 9px 14px; border-bottom: var(--head-rule);
+  border-radius: var(--radius) var(--radius) 0 0;
+}
+.panel-head .label { color: var(--head-ink); opacity: .9; font-weight: 700; font-size: 10.5px; }
+[data-variant="a"] .panel-head { border-bottom: 2px solid var(--accent); }
+[data-variant="a"] .panel-head .label { color: var(--accent); opacity: 1; }
+.panel-body { padding: var(--panel-pad); }
+
+.tag {
+  display: inline-flex; align-items: center; gap: 5px; font-family: var(--mono);
+  font-size: 10px; font-weight: 500; text-transform: uppercase;
+  letter-spacing: .1em; padding: 3px 7px; border-radius: calc(var(--radius) - 1px);
+  border: 1px solid transparent;
+}
+.tag-accent { background: var(--accent-soft); color: var(--accent); border-color: var(--rule); }
+.tag-gold { background: var(--gold-soft); color: var(--gold); border-color: var(--rule); }
+.tag-alarm { background: var(--alarm); color: var(--alarm-ink); }
+.tag-quiet { background: var(--panel-2); color: var(--ink-2); border-color: var(--rule); }
+.tag-solid { background: var(--accent); color: #fff; }
+
+.btn {
+  display: inline-flex; align-items: center; gap: 7px; font-family: var(--mono);
+  font-size: 11px; font-weight: 500; text-transform: uppercase; letter-spacing: .08em;
+  padding: 8px 13px; border-radius: var(--radius); border: 1px solid var(--rule-strong);
+  background: var(--panel); color: var(--ink); cursor: pointer;
+}
+.btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+[data-variant="c"] .btn-primary { color: var(--chrome-active-ink); }
+.btn-lg { font-size: 12px; padding: 12px 18px; }
+
+.rule { height: 1px; background: var(--rule); border: 0; margin: 0; }
+[data-variant="c"] .double-rule { border-top: 3px double var(--rule-strong); height: 0; background: none; }
+
+/* ==== mockup page scaffolding (chrome around the screens) ================= */
+.page-head { background: var(--chrome); color: var(--chrome-ink); padding: 26px 0 22px; }
+.page-head .wrap { max-width: 1320px; margin: 0 auto; padding: 0 28px; }
+.page-head h1 { font-size: 28px; color: var(--chrome-ink); }
+.page-head p { margin: 8px 0 0; color: var(--chrome-ink-2); max-width: 62ch; font-size: 14.5px; }
+
+.switcher {
+  position: sticky; top: 0; z-index: 40; background: var(--chrome);
+  border-bottom: 1px solid var(--chrome-rule); padding: 12px 0;
+}
+.switcher .wrap { max-width: 1320px; margin: 0 auto; padding: 0 28px;
+  display: flex; align-items: center; gap: 12px; flex-wrap: wrap; }
+.switcher .label { color: var(--chrome-ink-2); }
+.swbtn {
+  font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: .1em;
+  padding: 8px 14px; border-radius: var(--radius); cursor: pointer;
+  background: transparent; color: var(--chrome-ink-2); border: 1px solid var(--chrome-rule);
+}
+.swbtn[aria-pressed="true"] { background: var(--chrome-active); color: var(--chrome-active-ink);
+  border-color: var(--chrome-active-ink); }
+.swbtn .n { display: block; font-size: 9px; letter-spacing: .14em; opacity: .7; margin-top: 3px; }
+
+.section-note { max-width: 1320px; margin: 0 auto; padding: 44px 28px 14px; }
+.section-note h2 { font-size: 21px; }
+.section-note p { margin: 6px 0 0; color: var(--ink-2); font-size: 14px; max-width: 74ch; }
+.section-note .label { display: block; margin-bottom: 6px; color: var(--ink-3); }
+
+.frame {
+  max-width: 1320px; margin: 0 auto 12px; padding: 0 28px;
+}
+.screen {
+  border: var(--border) solid var(--rule-strong); border-radius: var(--radius);
+  overflow: hidden; background: var(--ground); box-shadow: var(--shadow);
+}
+
+/* ==== app chrome (sidebar + topbar) ====================================== */
+.app { display: grid; grid-template-columns: 208px 1fr; min-height: 560px; }
+.side { background: var(--chrome); color: var(--chrome-ink); padding: 0 0 18px; }
+.side .brandbox { padding: 16px 16px 14px; border-bottom: 1px solid var(--chrome-rule); }
+.side .wordmark {
+  font-family: var(--mono); font-size: 12.5px; font-weight: 700; letter-spacing: .18em;
+  text-transform: uppercase; color: var(--chrome-ink);
+}
+.side .sub { font-family: var(--mono); font-size: 9.5px; letter-spacing: .16em;
+  text-transform: uppercase; color: var(--chrome-ink-2); margin-top: 5px; line-height: 1.5; }
+.side .userbox {
+  display: flex; align-items: center; gap: 9px; padding: 12px 16px;
+  border-bottom: 1px solid var(--chrome-rule);
+}
+.avatar {
+  width: 28px; height: 28px; border-radius: var(--radius); display: grid; place-items: center;
+  background: var(--chrome-active); color: var(--chrome-active-ink);
+  font-family: var(--mono); font-size: 10px; font-weight: 700; letter-spacing: .04em;
+  border: 1px solid var(--chrome-rule);
+}
+.side .who { font-size: 13.5px; color: var(--chrome-ink); line-height: 1.25; }
+.side .who small { display: block; font-family: var(--mono); font-size: 9px; letter-spacing: .1em;
+  text-transform: uppercase; color: var(--chrome-ink-2); margin-top: 3px; }
+.nav { padding: 12px 0; }
+.nav a {
+  display: flex; align-items: center; gap: 10px; padding: 9px 16px;
+  color: var(--chrome-ink-2); font-size: 14px; border-left: 3px solid transparent;
+}
+[data-variant="c"] .nav a { font-family: var(--mono); font-size: 11.5px;
+  text-transform: uppercase; letter-spacing: .08em; }
+.nav a .ico { width: 15px; height: 15px; stroke: currentColor; fill: none; stroke-width: 1.8; }
+.nav a.on { background: var(--chrome-active); color: var(--chrome-active-ink);
+  border-left-color: var(--chrome-active-ink); }
+.nav .count { margin-left: auto; font-family: var(--mono); font-size: 9.5px;
+  background: var(--gold); color: #fff; padding: 1px 6px; border-radius: 999px; }
+[data-variant="c"] .nav .count { border-radius: 0; }
+
+.main { background: var(--ground); }
+.topbar {
+  display: flex; align-items: center; gap: 14px; padding: 11px 20px;
+  background: var(--panel); border-bottom: var(--border) solid var(--rule);
+}
+[data-variant="c"] .topbar { border-bottom: 2px solid var(--rule-strong); }
+.search {
+  flex: 1; max-width: 420px; display: flex; align-items: center; gap: 8px;
+  padding: 7px 11px; border: 1px solid var(--rule); border-radius: var(--radius);
+  background: var(--panel-2); color: var(--ink-3); font-size: 13.5px;
+}
+.topbar .right { margin-left: auto; display: flex; align-items: center; gap: 12px; }
+.topbar .right .label { font-size: 10px; }
+
+.pagehead {
+  display: flex; align-items: flex-end; justify-content: space-between; gap: 16px;
+  padding: 22px 24px; background: var(--accent); color: #fff; flex-wrap: wrap;
+}
+[data-variant="a"] .pagehead { background: var(--panel); color: var(--ink);
+  border-bottom: 2px solid var(--accent); }
+[data-variant="c"] .pagehead { background: var(--chrome); color: var(--chrome-ink);
+  border-bottom: 3px double var(--rule-strong); }
+.pagehead .label { color: inherit; opacity: .72; }
+.pagehead h2 { font-size: 27px; color: inherit; margin-top: 5px; }
+[data-variant="c"] .pagehead h2 { color: var(--chrome-active-ink); }
+
+.canvas { padding: 22px 24px 28px; display: grid; gap: 18px; }
+
+/* ---- dashboard cards ---------------------------------------------------- */
+.g3 { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(268px, 1fr)); }
+.statline {
+  display: flex; align-items: baseline; justify-content: space-between; gap: 12px;
+  padding: 10px 0; border-bottom: 1px solid var(--rule);
+}
+.statline:last-of-type { border-bottom: 0; }
+.statline .k { font-size: 14.5px; color: var(--ink-2); }
+.statline .v { font-family: var(--mono); font-size: 19px; font-weight: 500; }
+.linkline { margin-top: 12px; font-family: var(--mono); font-size: 11px;
+  text-transform: uppercase; letter-spacing: .1em; color: var(--accent-2);
+  border-bottom: 1px solid var(--accent-2); display: inline-block; padding-bottom: 2px; }
+[data-variant="c"] .linkline { color: var(--ink); border-color: var(--ink); }
+
+.msg { padding: 10px 0; border-bottom: 1px solid var(--rule); }
+.msg:last-child { border-bottom: 0; }
+.msg .top { display: flex; justify-content: space-between; gap: 10px; align-items: baseline; }
+.msg .from { font-weight: 600; font-size: 14px; }
+.msg .when { font-family: var(--mono); font-size: 10.5px; color: var(--ink-3); }
+.msg .body { color: var(--ink-2); font-size: 14px; margin-top: 2px; }
+
+/* ---- alert bar ---------------------------------------------------------- */
+.alert { border: var(--border) solid var(--alarm); border-radius: var(--radius); overflow: hidden; }
+.alert .bar {
+  background: var(--alarm); color: var(--alarm-ink); padding: 8px 14px;
+  display: flex; align-items: center; gap: 10px;
+}
+.alert .bar .label { color: var(--alarm-ink); font-weight: 700; }
+.alert .bar .note { font-size: 13px; opacity: .85; }
+.alert .row {
+  display: grid; gap: 14px; align-items: center; padding: 13px 14px;
+  grid-template-columns: 1.1fr 1.6fr 1fr auto; background: var(--alarm-soft);
+  border-top: 1px solid var(--rule);
+}
+.alert .row:first-of-type { border-top: 0; }
+.alert .row .trk { font-family: var(--display-font); font-weight: 700; font-size: 16px; }
+.alert .row .trk small { display: block; font-family: var(--mono); font-size: 10px;
+  letter-spacing: .1em; color: var(--ink-2); margin-top: 2px; font-weight: 400; }
+.alert .row .when { text-align: right; }
+.alert .row .when .d { font-family: var(--mono); font-size: 15px; font-weight: 500; color: var(--alarm); }
+.alert .row .when .r { font-family: var(--mono); font-size: 10px; color: var(--ink-2); }
+@media (max-width: 900px) { .alert .row { grid-template-columns: 1fr 1fr; } }
+
+/* ---- today's racing grid ------------------------------------------------ */
+.meets { display: grid; grid-template-columns: repeat(auto-fit, minmax(268px, 1fr)); }
+.meet { border-right: 1px solid var(--rule); border-bottom: 1px solid var(--rule); }
+.meet .hd {
+  display: flex; align-items: center; gap: 8px; padding: 8px 12px;
+  background: var(--chrome); color: var(--chrome-ink); border-bottom: 1px solid var(--chrome-rule);
+}
+[data-variant="a"] .meet .hd { background: var(--panel-2); color: var(--ink);
+  border-bottom: 1px solid var(--rule); }
+.meet .hd .code { font-family: var(--mono); font-weight: 700; font-size: 14px; letter-spacing: .06em; }
+.meet .hd .meta { font-family: var(--mono); font-size: 9.5px; letter-spacing: .1em;
+  text-transform: uppercase; opacity: .7; }
+.meet .hd .tag { margin-left: auto; }
+.meet .bd { padding: 12px; background: var(--panel); }
+.meet .nm { font-family: var(--display-font); font-weight: 600; font-size: 15px; }
+.meet .loc { font-size: 13px; color: var(--ink-2); }
+.meet .prog { display: flex; justify-content: space-between; align-items: baseline;
+  margin-top: 10px; font-family: var(--mono); font-size: 10.5px; letter-spacing: .06em;
+  text-transform: uppercase; color: var(--ink-2); }
+.bar-track { height: 4px; background: var(--panel-2); border: 1px solid var(--rule); margin-top: 5px; }
+.bar-fill { height: 100%; background: var(--accent-2); display: block; }
+.meet .ft { padding: 10px 12px; background: var(--panel-2); border-top: 1px solid var(--rule); }
+.meet .ft .label { display: block; margin-bottom: 3px; }
+.meet .ft .rc { font-size: 13.5px; }
+.meet .ft .pz { font-family: var(--mono); font-size: 13px; color: var(--gold); font-weight: 500; margin-top: 3px; }
+
+/* ---- data table --------------------------------------------------------- */
+.tablewrap { overflow-x: auto; }
+table.data { width: 100%; border-collapse: collapse; }
+table.data th {
+  font-family: var(--mono); font-size: 10px; text-transform: uppercase;
+  letter-spacing: var(--label-space); color: var(--ink-3); font-weight: 500;
+  text-align: left; padding: 10px 12px; background: var(--panel-2);
+  border-bottom: 1px solid var(--rule-strong); white-space: nowrap;
+}
+[data-variant="c"] table.data th { color: var(--ink); border-bottom: 2px solid var(--rule-strong); }
+table.data td { padding: var(--row-pad) 12px; border-bottom: 1px solid var(--rule);
+  vertical-align: top; font-size: 14px; }
+table.data tbody tr:nth-child(even) { background: var(--panel-2); }
+[data-variant="a"] table.data tbody tr:nth-child(even) { background: transparent; }
+table.data tbody tr:last-child td { border-bottom: 0; }
+.hname { font-family: var(--display-font); font-weight: 600; font-size: 16px;
+  border-bottom: 1px solid var(--ink-3); }
+.hmeta { font-family: var(--mono); font-size: 10.5px; color: var(--ink-2); margin-top: 3px;
+  letter-spacing: .04em; }
+.silks {
+  width: 26px; height: 26px; border-radius: var(--radius); display: grid; place-items: center;
+  font-family: var(--mono); font-size: 11px; font-weight: 700; color: #fff;
+  background: var(--accent); border: 1px solid var(--rule-strong);
+}
+.cellflex { display: flex; gap: 10px; align-items: flex-start; }
+.rec { font-family: var(--mono); font-size: 13.5px; }
+.rec small { display: block; color: var(--ink-2); font-size: 11px; margin-top: 3px; }
+.money { font-family: var(--mono); font-size: 14px; font-weight: 500; }
+
+.tabs { display: flex; gap: 0; border-bottom: 1px solid var(--rule-strong); flex-wrap: wrap; }
+.tabs a {
+  font-family: var(--mono); font-size: 11px; text-transform: uppercase; letter-spacing: .1em;
+  padding: 10px 15px; color: var(--ink-2); border: 1px solid transparent; border-bottom: 0;
+  margin-bottom: -1px;
+}
+.tabs a.on { background: var(--panel); color: var(--ink); border-color: var(--rule-strong);
+  border-radius: var(--radius) var(--radius) 0 0; font-weight: 700; }
+.tabs a .c { color: var(--ink-3); }
+
+/* ---- condition book ----------------------------------------------------- */
+.filters { display: flex; flex-wrap: wrap; gap: 8px; align-items: center; }
+.filters .chip {
+  font-family: var(--mono); font-size: 10.5px; text-transform: uppercase; letter-spacing: .08em;
+  padding: 6px 11px; border: 1px solid var(--rule); border-radius: var(--radius);
+  background: var(--panel); color: var(--ink-2);
+}
+.filters .chip.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+[data-variant="c"] .filters .chip.on { color: var(--chrome-active-ink); }
+
+.race { border-bottom: 1px solid var(--rule); padding: 15px 16px; display: grid;
+  grid-template-columns: 62px 1fr 210px; gap: 16px; align-items: start; }
+.race:last-child { border-bottom: 0; }
+[data-variant="c"] .race { border-bottom: 1px solid var(--rule-strong); }
+.race .no { text-align: center; }
+.race .no .rn { font-family: var(--display-font); font-size: 26px; font-weight: 700; line-height: 1; }
+.race .no .rl { font-family: var(--mono); font-size: 9px; letter-spacing: .14em;
+  text-transform: uppercase; color: var(--ink-3); margin-top: 3px; }
+.race .ttl { font-family: var(--display-font); font-size: 17px; font-weight: 600; }
+.race .facts { display: flex; flex-wrap: wrap; gap: 6px; margin-top: 7px; }
+.race .cond {
+  margin-top: 9px; font-family: var(--mono); font-size: 11px; line-height: 1.65;
+  color: var(--ink-2); background: var(--panel-2); border: 1px solid var(--rule);
+  border-left: 3px solid var(--rule-strong); padding: 9px 11px;
+}
+.race .side { text-align: right; }
+.race .spots { font-family: var(--mono); font-size: 12px; color: var(--ink-2); }
+.race .spots b { color: var(--ink); font-size: 15px; }
+.race .close { font-family: var(--mono); font-size: 11px; color: var(--alarm); margin-top: 5px; }
+.race .side .btn { margin-top: 10px; }
+@media (max-width: 860px) { .race { grid-template-columns: 48px 1fr; } .race .side { grid-column: 2; text-align: left; } }
+
+/* ---- race detail -------------------------------------------------------- */
+.detail { display: grid; gap: 18px; grid-template-columns: 1.55fr 1fr; }
+@media (max-width: 980px) { .detail { grid-template-columns: 1fr; } }
+.condfull {
+  font-family: var(--mono); font-size: 12px; line-height: 1.85; color: var(--ink);
+  background: var(--panel-2); border: 1px solid var(--rule); padding: 14px 16px;
+}
+[data-variant="c"] .condfull { border: 1px solid var(--rule-strong); }
+.kv { display: grid; grid-template-columns: repeat(auto-fit, minmax(132px, 1fr)); gap: 14px;
+  margin-top: 16px; }
+.kv .k { display: block; margin-bottom: 4px; }
+.kv .v { font-family: var(--mono); font-size: 13.5px; }
+.check { display: flex; gap: 10px; align-items: flex-start; padding: 10px 0;
+  border-bottom: 1px solid var(--rule); font-size: 14px; }
+.check:last-child { border-bottom: 0; }
+.check .mk { font-family: var(--mono); font-size: 12px; font-weight: 700; line-height: 1.5; }
+.check.pass .mk { color: var(--accent-2); }
+.check.flag .mk { color: var(--gold); }
+.check .cl { display: block; font-family: var(--mono); font-size: 10.5px; color: var(--ink-3);
+  margin-top: 3px; letter-spacing: .04em; }
+.field { margin-bottom: 13px; }
+.field .label { display: block; margin-bottom: 5px; }
+.field .control {
+  display: flex; align-items: center; justify-content: space-between;
+  padding: 9px 11px; border: 1px solid var(--rule-strong); border-radius: var(--radius);
+  background: var(--panel); font-size: 14px;
+}
+.field .control .caret { font-family: var(--mono); color: var(--ink-3); font-size: 11px; }
+.notice {
+  border: 1px solid var(--gold); border-left-width: 3px; background: var(--gold-soft);
+  color: var(--gold); padding: 11px 13px; font-size: 13.5px; border-radius: var(--radius);
+}
+.notice b { display: block; margin-bottom: 3px; }
+
+/* ---- landing ------------------------------------------------------------ */
+.lnav {
+  display: flex; align-items: center; gap: 22px; padding: 14px 24px;
+  background: var(--chrome); color: var(--chrome-ink); flex-wrap: wrap;
+}
+[data-variant="a"] .lnav { background: var(--panel); color: var(--ink);
+  border-bottom: 1px solid var(--rule); }
+.lnav .wordmark { font-family: var(--mono); font-size: 12.5px; font-weight: 700;
+  letter-spacing: .2em; text-transform: uppercase; }
+.lnav .links { display: flex; gap: 20px; margin-left: auto; flex-wrap: wrap;
+  font-family: var(--mono); font-size: 10.5px; letter-spacing: .1em; text-transform: uppercase;
+  color: var(--chrome-ink-2); }
+[data-variant="a"] .lnav .links { color: var(--ink-2); }
+
+.hero { padding: 52px 26px 44px; display: grid; gap: 36px; grid-template-columns: 1.05fr .95fr;
+  align-items: center; background: var(--ground); border-bottom: 1px solid var(--rule); }
+[data-variant="c"] .hero { border-bottom: 3px double var(--rule-strong); }
+@media (max-width: 940px) { .hero { grid-template-columns: 1fr; } }
+.hero .kicker { display: flex; align-items: center; gap: 9px; margin-bottom: 16px; }
+.hero .kicker .ln { flex: 1; height: 1px; background: var(--rule-strong); max-width: 70px; }
+.hero h2 { font-size: clamp(30px, 3.7vw, 45px); line-height: 1.08; }
+.hero h2 em { font-style: italic; color: var(--accent-2); }
+[data-variant="c"] .hero h2 em { color: var(--gold); }
+.hero p.lede { font-size: 17px; color: var(--ink-2); margin: 16px 0 0; max-width: 40em; }
+.hero .cta { display: flex; gap: 10px; margin-top: 24px; flex-wrap: wrap; }
+.hero .assure { display: flex; gap: 18px; margin-top: 20px; flex-wrap: wrap; }
+
+.loop { display: grid; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr)); }
+.loop .step { padding: 20px 18px; border-right: 1px solid var(--rule); border-top: 1px solid var(--rule); }
+.loop .step .n { font-family: var(--display-font); font-size: 30px; font-weight: 700;
+  color: var(--rule-strong); line-height: 1; }
+[data-variant="c"] .loop .step .n { color: var(--gold); }
+.loop .step h4 { font-size: 16px; margin: 8px 0 5px; }
+.loop .step p { margin: 0; font-size: 14px; color: var(--ink-2); }
+
+.circuit { display: flex; flex-wrap: wrap; gap: 0; border-top: 1px solid var(--rule); }
+.circuit .t { flex: 1 1 150px; padding: 14px 16px; border-right: 1px solid var(--rule); }
+.circuit .t .c { font-family: var(--mono); font-weight: 700; font-size: 15px; letter-spacing: .08em; }
+.circuit .t .n { font-size: 13px; color: var(--ink-2); margin-top: 2px; }
+
+/* ---- doc footer --------------------------------------------------------- */
+.docfoot { max-width: 1320px; margin: 40px auto 0; padding: 24px 28px 56px;
+  border-top: 1px solid var(--rule); color: var(--ink-2); font-size: 14px; }
+.docfoot code { font-family: var(--mono); font-size: 12.5px; }
+</style>
+</head>
+<body>
+
+<div class="page-head">
+  <div class="wrap">
+    <div class="label" style="color:var(--chrome-ink-2)">PostParade v2 · design exploration · 2026-08-06</div>
+    <h1 style="margin-top:8px">Classic direction — three variants</h1>
+    <p>The same five screens under three treatments, built from the partner's screenshots. Real seed
+      data throughout (Kinnon LaRose's roster, Ellis Park's book), so the density is honest.
+      Switch variants below — every screen on the page changes with it.</p>
+  </div>
+</div>
+
+<div class="switcher">
+  <div class="wrap">
+    <span class="label">Direction</span>
+    <button class="swbtn" data-set="a" aria-pressed="false">Paddock<span class="n">Restrained</span></button>
+    <button class="swbtn" data-set="b" aria-pressed="true">Condition Book<span class="n">The partner's</span></button>
+    <button class="swbtn" data-set="c" aria-pressed="false">Racing Form<span class="n">Full newsprint</span></button>
+    <span class="label" id="blurb" style="margin-left:8px; color:var(--chrome-ink-2)"></span>
+  </div>
+</div>
+
+<!-- ================= 1 · LANDING ================= -->
+<div class="section-note">
+  <span class="label">Screen 1 of 5</span>
+  <h2>Landing page</h2>
+  <p>The page we just rebuilt, re-cut in the classic direction: serif display over monospace
+    micro-labels, hairline rules instead of drop shadows, and the condition book as the hero object.</p>
+</div>
+<div class="frame">
+  <div class="screen">
+
+    <div class="lnav">
+      <span class="wordmark">PostParade</span>
+      <span class="tag tag-quiet">v2 · prototype</span>
+      <span class="links">
+        <span>How it works</span><span>Who it's for</span><span>Condition books</span><span>Pricing</span>
+      </span>
+    </div>
+
+    <div class="hero">
+      <div>
+        <div class="kicker">
+          <span class="ln"></span>
+          <span class="label">For trainers and racing offices</span>
+        </div>
+        <h2>Find the right race.<br><em>Every horse. Every week.</em></h2>
+        <p class="lede">Every condition book on your circuit in one place, each condition checked
+          against your horse, and every conflict flagged for a person at the racing office to rule
+          on. It does not rate horses or forecast races.</p>
+        <div class="cta">
+          <button class="btn btn-primary btn-lg">Open the app →</button>
+          <button class="btn btn-lg">See the office queue</button>
+        </div>
+        <div class="assure">
+          <span class="label">✓ No setup</span>
+          <span class="label">✓ Live sample data</span>
+          <span class="label">✓ 2 min to walk through</span>
+        </div>
+      </div>
+
+      <div class="panel">
+        <div class="panel-head">
+          <span class="label">Ellis Park · condition book</span>
+          <span class="tag tag-gold">4 spots open</span>
+        </div>
+        <div class="panel-body">
+          <div style="display:flex;justify-content:space-between;align-items:baseline;gap:12px">
+            <h3 style="font-size:19px">Race 3 · Allowance</h3>
+            <span class="num" style="font-size:13px;color:var(--ink-2)">6f · Dirt</span>
+          </div>
+          <div class="hmeta">SAT AUG 14 · POST 5:15 PM CT · ENTRIES CLOSE TUE 10:00</div>
+          <div class="condfull" style="margin-top:12px">
+            FOR MAIDENS, FILLIES AND MARES THREE YEARS OLD AND UPWARD. Weight, 121 lbs.
+            (Preference to horses that have not started for less than $50,000.)
+          </div>
+          <div style="margin-top:12px">
+            <div class="check pass"><span class="mk">✓</span><span>Filly, 4yo — meets sex and age
+              <span class="cl">CLAUSE 1 · F&amp;M, 3YO+</span></span></div>
+            <div class="check pass"><span class="mk">✓</span><span>Maiden — 0 career wins
+              <span class="cl">CLAUSE 2 · MAIDENS</span></span></div>
+            <div class="check flag"><span class="mk">!</span><span>Has started for $35,000 — preferred entries fill first
+              <span class="cl">CLAUSE 3 · PREFERENCE</span></span></div>
+          </div>
+          <div class="notice" style="margin-top:12px">
+            <b>Flagged, not ruled.</b>Submit anyway — the racing office decides who draws in.
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="loop">
+      <div class="step"><div class="n">1</div><h4>The track publishes its book</h4>
+        <p>Every race, purse, surface, distance, the conditions as written, and how many spots it holds.</p></div>
+      <div class="step"><div class="n">2</div><h4>You read it and submit</h4>
+        <p>Filter by entry close, date, surface, type, or purse. Name a jockey, flag AE or MTO, submit.</p></div>
+      <div class="step"><div class="n">3</div><h4>The conditions get checked</h4>
+        <p>Sex, age, the maiden and non-winners ladders, claiming clauses, registry, vet's list.</p></div>
+      <div class="step"><div class="n">4</div><h4>The office accepts or declines</h4>
+        <p>A standard reason plus a comment. You see the reason, the comment, and the timestamp.</p></div>
+    </div>
+
+    <div class="circuit">
+      <div class="t"><div class="c">ELP</div><div class="n">Ellis Park · Henderson, KY</div></div>
+      <div class="t"><div class="c">SAR</div><div class="n">Saratoga · Saratoga Springs, NY</div></div>
+      <div class="t"><div class="c">EVD</div><div class="n">Evangeline Downs · Opelousas, LA</div></div>
+      <div class="t"><div class="c">DED</div><div class="n">Delta Downs · Vinton, LA</div></div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ================= 2 · DASHBOARD ================= -->
+<div class="section-note">
+  <span class="label">Screen 2 of 5</span>
+  <h2>Trainer dashboard</h2>
+  <p>Closest to the partner's first screenshot: three summary panels, an oxblood deadline bar, and
+    today's racing as a ruled grid of meets.</p>
+</div>
+<div class="frame">
+  <div class="screen">
+    <div class="app">
+
+      <aside class="side">
+        <div class="brandbox">
+          <div class="wordmark">PostParade</div>
+          <div class="sub">Trainer<br>Workspace</div>
+        </div>
+        <div class="userbox">
+          <span class="avatar">KL</span>
+          <div class="who">Kinnon LaRose<small>Edit profile →</small></div>
+        </div>
+        <nav class="nav">
+          <a class="on"><svg class="ico" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7"/><rect x="14" y="3" width="7" height="7"/><rect x="3" y="14" width="7" height="7"/><rect x="14" y="14" width="7" height="7"/></svg>Dashboard</a>
+          <a><svg class="ico" viewBox="0 0 24 24"><path d="M4 18v-6a8 8 0 0 1 16 0v6"/><path d="M4 18h16"/></svg>My Horses</a>
+          <a><svg class="ico" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></svg>Condition Books</a>
+          <a><svg class="ico" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg>Entry Windows</a>
+          <a><svg class="ico" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></svg>Messages<span class="count">2</span></a>
+          <a><svg class="ico" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></svg>Account</a>
+        </nav>
+      </aside>
+
+      <div class="main">
+        <div class="topbar">
+          <div class="search">⌕ Search horses, tracks, races…</div>
+          <div class="right">
+            <span class="label">Kinnon LaRose Racing</span>
+            <span class="label">·</span>
+            <span class="label">v0.2 prototype</span>
+          </div>
+        </div>
+
+        <div class="pagehead">
+          <div>
+            <span class="label">08/06/2026 · Trainer workspace</span>
+            <h2>Good afternoon, Kinnon.</h2>
+          </div>
+          <span class="tag tag-gold">2 books close within 48 hours</span>
+        </div>
+
+        <div class="canvas">
+
+          <div class="g3">
+            <div class="panel">
+              <div class="panel-head"><span class="label">My horses</span></div>
+              <div class="panel-body">
+                <div class="statline"><span class="k">In stable</span><span class="v">16</span></div>
+                <div class="statline"><span class="k">Without an entry</span><span class="v">11</span></div>
+                <div class="statline"><span class="k">Entered this week</span><span class="v">5</span></div>
+                <a class="linkline">View all horses →</a>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-head"><span class="label">Condition books</span></div>
+              <div class="panel-body">
+                <span class="label" style="display:block;margin-bottom:6px">Entries closing soon</span>
+                <div class="statline"><span class="k">Ellis Park</span><span class="v" style="font-size:14px;color:var(--alarm)">2d left</span></div>
+                <div class="statline"><span class="k">Saratoga</span><span class="v" style="font-size:14px">3d left</span></div>
+                <div class="statline"><span class="k">Evangeline Downs</span><span class="v" style="font-size:14px">5d left</span></div>
+                <div class="statline"><span class="k">Delta Downs</span><span class="v" style="font-size:14px">8d left</span></div>
+                <a class="linkline">View condition books →</a>
+              </div>
+            </div>
+
+            <div class="panel">
+              <div class="panel-head">
+                <span class="label">Messages</span>
+                <span class="tag tag-gold">2 new</span>
+              </div>
+              <div class="panel-body">
+                <span class="label" style="display:block;margin-bottom:4px">Recent</span>
+                <div class="msg">
+                  <div class="top"><span class="from">Ellis Park Entry Office</span><span class="when">8:14 AM</span></div>
+                  <div class="body">Re: Sabine Pass — R3 preference clause</div>
+                </div>
+                <div class="msg">
+                  <div class="top"><span class="from">Saratoga Entry Office</span><span class="when">Yesterday</span></div>
+                  <div class="body">Arthur Jr. — accepted</div>
+                </div>
+                <div class="msg">
+                  <div class="top"><span class="from">Delta Downs Entry Office</span><span class="when">08/04/2026</span></div>
+                  <div class="body">Modo — declined, race did not fill</div>
+                </div>
+                <a class="linkline">View all messages →</a>
+              </div>
+            </div>
+          </div>
+
+          <div class="alert">
+            <div class="bar">
+              <span class="label">● Entry deadline</span>
+              <span class="note">2 condition books close within 48 hours</span>
+            </div>
+            <div class="row">
+              <div class="trk">Ellis Park<small>ELP · KY</small></div>
+              <div>
+                <span class="label">Races affected</span>
+                <div style="font-size:14px;margin-top:3px">9-race card · Race day 08/14/2026</div>
+              </div>
+              <div class="when">
+                <span class="label">Entries close</span>
+                <div class="d">08/11/2026</div>
+                <div class="r">2d 0h remaining</div>
+              </div>
+              <button class="btn">Open book →</button>
+            </div>
+            <div class="row">
+              <div class="trk">Saratoga<small>SAR · NY</small></div>
+              <div>
+                <span class="label">Races affected</span>
+                <div style="font-size:14px;margin-top:3px">2-race card · Race day 08/15/2026</div>
+              </div>
+              <div class="when">
+                <span class="label">Entries close</span>
+                <div class="d">08/12/2026</div>
+                <div class="r">3d 0h remaining</div>
+              </div>
+              <button class="btn">Open book →</button>
+            </div>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <span class="label">● Today's racing · Thu Aug 6 2026</span>
+              <span class="label">Your circuit</span>
+            </div>
+            <div class="meets">
+              <div class="meet">
+                <div class="hd"><span class="code">ELP</span><span class="meta">KY · Dirt / Turf</span><span class="tag tag-gold">Entries open</span></div>
+                <div class="bd">
+                  <div class="nm">Ellis Park</div>
+                  <div class="loc">Henderson, KY</div>
+                  <div class="prog"><span>9-race card</span><span>1st post 1:15 PM CT</span></div>
+                  <div class="bar-track"><span class="bar-fill" style="width:34%"></span></div>
+                </div>
+                <div class="ft"><span class="label">Featured</span>
+                  <div class="rc">R5 · Claiming $22,000 · 6f Dirt</div>
+                  <div class="pz">$27,500</div></div>
+              </div>
+              <div class="meet">
+                <div class="hd"><span class="code">SAR</span><span class="meta">NY · Dirt / Turf</span><span class="tag tag-accent">Racing</span></div>
+                <div class="bd">
+                  <div class="nm">Saratoga Race Course</div>
+                  <div class="loc">Saratoga Springs, NY</div>
+                  <div class="prog"><span>Race 5 of 9</span><span>3:49 PM ET</span></div>
+                  <div class="bar-track"><span class="bar-fill" style="width:56%"></span></div>
+                </div>
+                <div class="ft"><span class="label">Featured</span>
+                  <div class="rc">R8 · Allowance Opt. Clm · 1m Turf</div>
+                  <div class="pz">$105,000</div></div>
+              </div>
+              <div class="meet">
+                <div class="hd"><span class="code">EVD</span><span class="meta">LA · Dirt / Turf</span><span class="tag tag-quiet">Between races</span></div>
+                <div class="bd">
+                  <div class="nm">Evangeline Downs</div>
+                  <div class="loc">Opelousas, LA</div>
+                  <div class="prog"><span>Race 3 of 8</span><span>7:20 PM CT</span></div>
+                  <div class="bar-track"><span class="bar-fill" style="width:38%"></span></div>
+                </div>
+                <div class="ft"><span class="label">Featured</span>
+                  <div class="rc">R7 · Allowance · 5½f Turf</div>
+                  <div class="pz">$46,000</div></div>
+              </div>
+              <div class="meet">
+                <div class="hd"><span class="code">DED</span><span class="meta">LA · Dirt</span><span class="tag tag-alarm">Dark</span></div>
+                <div class="bd">
+                  <div class="nm">Delta Downs</div>
+                  <div class="loc">Vinton, LA</div>
+                  <div class="prog"><span>Dark today</span><span>—</span></div>
+                  <div class="bar-track"><span class="bar-fill" style="width:0%"></span></div>
+                </div>
+                <div class="ft"><span class="label">Featured</span>
+                  <div class="rc">Next card 08/09/2026</div>
+                  <div class="pz">—</div></div>
+              </div>
+            </div>
+            <div style="padding:9px 14px;background:var(--panel-2);border-top:1px solid var(--rule);text-align:right">
+              <span class="label">Illustrative card data · not a system of record</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= 3 · MY HORSES ================= -->
+<div class="section-note">
+  <span class="label">Screen 3 of 5</span>
+  <h2>My Horses</h2>
+  <p>The partner's roster table with the real LaRose string. Records and earnings are facts; the
+    "next entry" column is a submitted request, not a suggestion.</p>
+</div>
+<div class="frame">
+  <div class="screen">
+    <div class="app">
+      <aside class="side">
+        <div class="brandbox">
+          <div class="wordmark">PostParade</div>
+          <div class="sub">Trainer<br>Workspace</div>
+        </div>
+        <div class="userbox">
+          <span class="avatar">KL</span>
+          <div class="who">Kinnon LaRose<small>Edit profile →</small></div>
+        </div>
+        <nav class="nav">
+          <a>Dashboard</a>
+          <a class="on">My Horses</a>
+          <a>Condition Books</a>
+          <a>Entry Windows</a>
+          <a>Messages<span class="count">2</span></a>
+          <a>Account</a>
+        </nav>
+      </aside>
+
+      <div class="main">
+        <div class="topbar">
+          <div class="search">⌕ Search horses, tracks, races…</div>
+          <div class="right"><span class="label">Kinnon LaRose Racing</span></div>
+        </div>
+
+        <div class="pagehead">
+          <div>
+            <span class="label">Stable roster</span>
+            <h2>My Horses</h2>
+          </div>
+          <button class="btn btn-primary">+ Add horse</button>
+        </div>
+
+        <div class="canvas">
+          <div class="tabs">
+            <a class="on">All <span class="c">(16)</span></a>
+            <a>Without an entry <span class="c">(11)</span></a>
+            <a>Entered <span class="c">(5)</span></a>
+            <a>Unraced <span class="c">(3)</span></a>
+          </div>
+
+          <div class="panel" style="margin-top:-1px">
+            <div class="tablewrap">
+              <table class="data">
+                <thead>
+                  <tr>
+                    <th>Horse</th><th>Record</th><th>Earnings</th><th>Last start</th>
+                    <th>Next entry</th><th></th>
+                  </tr>
+                </thead>
+                <tbody>
+                  <tr>
+                    <td>
+                      <div class="cellflex">
+                        <span class="silks">M</span>
+                        <div>
+                          <div class="hname">Modo</div>
+                          <div class="hmeta">5YO M · BAY · TX BRED</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td><div class="rec">12 sts · 6–2–1<small>Liam's Map — Academy Road</small></div></td>
+                    <td><span class="money">$318,450</span></td>
+                    <td><div class="rec">04/24/2026 · 1st of 9<small>Bluebonnet Stakes · LS · 6½f D</small></div></td>
+                    <td><div class="rec" style="color:var(--accent-2)">ELP R6 · 08/14<small>Submitted · awaiting decision</small></div></td>
+                    <td><button class="btn">Open book →</button></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="cellflex">
+                        <span class="silks">C</span>
+                        <div>
+                          <div class="hname">Carbone</div>
+                          <div class="hmeta">5YO G · DK B/BR · KY BRED</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td><div class="rec">15 sts · 4–3–2<small>Munnings — Coastal Kiss</small></div></td>
+                    <td><span class="money">$286,900</span></td>
+                    <td><div class="rec">07/19/2026 · 1st of 8<small>Alw 62k · ELP · 6f D</small></div></td>
+                    <td><div class="rec" style="color:var(--accent-2)">SAR R4 · 08/15<small>Accepted 08/05 11:07</small></div></td>
+                    <td><button class="btn">Open book →</button></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="cellflex">
+                        <span class="silks">O</span>
+                        <div>
+                          <div class="hname">Oscar's Hope</div>
+                          <div class="hmeta">3YO C · BAY · KY BRED</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td><div class="rec">5 sts · 2–2–0<small>Constitution — Bright Vision</small></div></td>
+                    <td><span class="money">$214,300</span></td>
+                    <td><div class="rec">07/26/2026 · 3rd of 9<small>Alw 40k · ELP · 6½f D</small></div></td>
+                    <td><div class="rec" style="color:var(--ink-3)">—<small>No open request</small></div></td>
+                    <td><button class="btn">Open book →</button></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="cellflex">
+                        <span class="silks">S</span>
+                        <div>
+                          <div class="hname">Standoutsensation</div>
+                          <div class="hmeta">5YO M · BAY · KY BRED</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td><div class="rec">14 sts · 3–4–3<small>Into Mischief — Sensational Star</small></div></td>
+                    <td><span class="money">$396,500</span></td>
+                    <td><div class="rec">07/20/2026 · 1st of 7<small>Alw 45k · EVD · 6½f D</small></div></td>
+                    <td><div class="rec" style="color:var(--gold)">EVD R3 · 08/16<small>Conflict flagged · submitted anyway</small></div></td>
+                    <td><button class="btn">Open book →</button></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="cellflex">
+                        <span class="silks">E</span>
+                        <div>
+                          <div class="hname">Eye Dee Kay</div>
+                          <div class="hmeta">7YO G · CHESTNUT · KY BRED</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td><div class="rec">27 sts · 5–6–4<small>Kantharos — Dee's Delight</small></div></td>
+                    <td><span class="money">$402,100</span></td>
+                    <td><div class="rec">07/14/2026 · 1st of 9<small>Alw 44k · DED · 8.3f D</small></div></td>
+                    <td><div class="rec" style="color:var(--ink-3)">—<small>No open request</small></div></td>
+                    <td><button class="btn">Open book →</button></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="cellflex">
+                        <span class="silks">S</span>
+                        <div>
+                          <div class="hname">Sabine Pass</div>
+                          <div class="hmeta">4YO F · GRAY/ROAN · KY BRED</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td><div class="rec">9 sts · 1–2–1<small>Gun Runner — Bayou Belle</small></div></td>
+                    <td><span class="money">$71,300</span></td>
+                    <td><div class="rec">07/02/2026 · 4th of 10<small>Clm 25k · DED · 6f D</small></div></td>
+                    <td><div class="rec" style="color:var(--gold)">ELP R3 · 08/14<small>Preference clause flagged</small></div></td>
+                    <td><button class="btn">Open book →</button></td>
+                  </tr>
+                  <tr>
+                    <td>
+                      <div class="cellflex">
+                        <span class="silks">M</span>
+                        <div>
+                          <div class="hname">Midnight Still</div>
+                          <div class="hmeta">2YO C · DK B/BR · KY BRED</div>
+                        </div>
+                      </div>
+                    </td>
+                    <td><div class="rec">0 sts · unraced<small>Nyquist — Quiet Evening</small></div></td>
+                    <td><span class="money">$0</span></td>
+                    <td><div class="rec" style="color:var(--ink-3)">—<small>No starts</small></div></td>
+                    <td><div class="rec" style="color:var(--ink-3)">—<small>Maiden races only</small></div></td>
+                    <td><button class="btn">Open book →</button></td>
+                  </tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+          <span class="label">Showing 7 of 16 · records and earnings from the horse's own past performances</span>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= 4 · CONDITION BOOK ================= -->
+<div class="section-note">
+  <span class="label">Screen 4 of 5</span>
+  <h2>Condition book</h2>
+  <p>Where the classic treatment earns its keep — a printed book is exactly what this is. Condition
+    text set in monospace against the parsed facts, races ruled apart like a printed card.</p>
+</div>
+<div class="frame">
+  <div class="screen">
+    <div class="app">
+      <aside class="side">
+        <div class="brandbox">
+          <div class="wordmark">PostParade</div>
+          <div class="sub">Trainer<br>Workspace</div>
+        </div>
+        <div class="userbox">
+          <span class="avatar">KL</span>
+          <div class="who">Kinnon LaRose<small>Edit profile →</small></div>
+        </div>
+        <nav class="nav">
+          <a>Dashboard</a>
+          <a>My Horses</a>
+          <a class="on">Condition Books</a>
+          <a>Entry Windows</a>
+          <a>Messages<span class="count">2</span></a>
+          <a>Account</a>
+        </nav>
+      </aside>
+
+      <div class="main">
+        <div class="topbar">
+          <div class="search">⌕ Search horses, tracks, races…</div>
+          <div class="right"><span class="label">Kinnon LaRose Racing</span></div>
+        </div>
+
+        <div class="pagehead">
+          <div>
+            <span class="label">Ellis Park · summer meet · ELP</span>
+            <h2>Condition book — race day 08/14</h2>
+          </div>
+          <div style="text-align:right">
+            <span class="label">Entries close</span>
+            <div class="num" style="font-size:17px;margin-top:3px">08/11 · 10:00 CT</div>
+          </div>
+        </div>
+
+        <div class="canvas">
+          <div class="filters">
+            <span class="label" style="margin-right:4px">Filter</span>
+            <span class="chip on">All 9 races</span>
+            <span class="chip">Dirt</span>
+            <span class="chip">Turf</span>
+            <span class="chip">Maiden</span>
+            <span class="chip">Claiming</span>
+            <span class="chip">Allowance</span>
+            <span class="chip">Stakes</span>
+            <span class="chip">Spots open</span>
+          </div>
+
+          <div class="panel">
+            <div class="panel-head">
+              <span class="label">Sat Aug 14 · 9-race card · 1st post 1:15 PM CT</span>
+              <span class="label">See all conditions →</span>
+            </div>
+
+            <div class="race">
+              <div class="no"><div class="rn">1</div><div class="rl">Race</div></div>
+              <div>
+                <div class="ttl">Maiden Claiming $30,000</div>
+                <div class="facts">
+                  <span class="tag tag-quiet">6f · Dirt</span>
+                  <span class="tag tag-quiet">Purse $34,000</span>
+                  <span class="tag tag-quiet">F&amp;M · 3yo+</span>
+                  <span class="tag tag-quiet">Post 5:15 PM</span>
+                </div>
+                <div class="cond">MAIDEN CLAIMING. Purse $34,000. FOR MAIDENS, FILLIES AND MARES THREE
+                  YEARS OLD AND UPWARD. Weight, 121 lbs. Claiming Price $30,000. Six Furlongs. (Dirt)</div>
+              </div>
+              <div class="side">
+                <div class="spots"><b>4</b> of 10 spots open</div>
+                <div class="close">Closes in 2d 0h</div>
+                <button class="btn btn-primary">Submit an entry</button>
+              </div>
+            </div>
+
+            <div class="race">
+              <div class="no"><div class="rn">3</div><div class="rl">Race</div></div>
+              <div>
+                <div class="ttl">Allowance</div>
+                <div class="facts">
+                  <span class="tag tag-quiet">6f · Dirt</span>
+                  <span class="tag tag-quiet">Purse $85,000</span>
+                  <span class="tag tag-quiet">F&amp;M · 3yo+</span>
+                  <span class="tag tag-gold">Preference clause</span>
+                </div>
+                <div class="cond">ALLOWANCE. Purse $85,000. FOR MAIDENS, FILLIES AND MARES THREE YEARS
+                  OLD AND UPWARD. Weight, 121 lbs. (Preference to horses that have not started for
+                  less than $50,000.) Six Furlongs. (Dirt)</div>
+              </div>
+              <div class="side">
+                <div class="spots"><b>4</b> of 12 spots open</div>
+                <div class="close">Closes in 2d 0h</div>
+                <button class="btn btn-primary">Submit an entry</button>
+              </div>
+            </div>
+
+            <div class="race">
+              <div class="no"><div class="rn">5</div><div class="rl">Race</div></div>
+              <div>
+                <div class="ttl">Claiming $22,000</div>
+                <div class="facts">
+                  <span class="tag tag-quiet">6f · Dirt</span>
+                  <span class="tag tag-quiet">Purse $27,500</span>
+                  <span class="tag tag-quiet">3yo+</span>
+                  <span class="tag tag-accent">MTO allowed</span>
+                </div>
+                <div class="cond">CLAIMING. Purse $27,500. FOR THREE YEAR OLDS AND UPWARD WHICH HAVE
+                  NEVER WON TWO RACES. Three Year Olds, 120 lbs.; Older, 124 lbs. Claiming Price
+                  $22,000. Six Furlongs. (Dirt)</div>
+              </div>
+              <div class="side">
+                <div class="spots"><b>2</b> of 10 spots open</div>
+                <div class="close">Closes in 2d 0h</div>
+                <button class="btn btn-primary">Submit an entry</button>
+              </div>
+            </div>
+
+            <div class="race">
+              <div class="no"><div class="rn">8</div><div class="rl">Race</div></div>
+              <div>
+                <div class="ttl">Groupie Doll Stakes · Gr. III</div>
+                <div class="facts">
+                  <span class="tag tag-quiet">7f · Dirt</span>
+                  <span class="tag tag-gold">Purse $300,000</span>
+                  <span class="tag tag-quiet">F&amp;M · 3yo+</span>
+                  <span class="tag tag-quiet">Nomination required</span>
+                </div>
+                <div class="cond">STAKES. Purse $300,000. FOR FILLIES AND MARES THREE YEARS OLD AND
+                  UPWARD. By subscription of $250 each, which should accompany the nomination.
+                  Seven Furlongs. (Dirt)</div>
+              </div>
+              <div class="side">
+                <div class="spots"><b>6</b> of 14 spots open</div>
+                <div class="close">Closes in 2d 0h</div>
+                <button class="btn btn-primary">Submit an entry</button>
+              </div>
+            </div>
+
+            <div style="padding:11px 16px;background:var(--panel-2);border-top:1px solid var(--rule);display:flex;justify-content:space-between;flex-wrap:wrap;gap:8px">
+              <span class="label">Showing 4 of 9 races</span>
+              <span class="label">Condition books are illustrative demo data</span>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<!-- ================= 5 · RACE DETAIL ================= -->
+<div class="section-note">
+  <span class="label">Screen 5 of 5</span>
+  <h2>Race detail &amp; submission</h2>
+  <p>The conditions as written, the parsed structure beside them, the checker's read clause by
+    clause, and the submission form. The flag never blocks the submit.</p>
+</div>
+<div class="frame">
+  <div class="screen">
+    <div class="app">
+      <aside class="side">
+        <div class="brandbox">
+          <div class="wordmark">PostParade</div>
+          <div class="sub">Trainer<br>Workspace</div>
+        </div>
+        <div class="userbox">
+          <span class="avatar">KL</span>
+          <div class="who">Kinnon LaRose<small>Edit profile →</small></div>
+        </div>
+        <nav class="nav">
+          <a>Dashboard</a>
+          <a>My Horses</a>
+          <a class="on">Condition Books</a>
+          <a>Entry Windows</a>
+          <a>Messages<span class="count">2</span></a>
+          <a>Account</a>
+        </nav>
+      </aside>
+
+      <div class="main">
+        <div class="topbar">
+          <div class="search">⌕ Search horses, tracks, races…</div>
+          <div class="right"><span class="label">Kinnon LaRose Racing</span></div>
+        </div>
+
+        <div class="pagehead">
+          <div>
+            <span class="label">Ellis Park · Sat Aug 14 · Race 3</span>
+            <h2>Allowance · 6 Furlongs · Dirt</h2>
+          </div>
+          <div style="text-align:right">
+            <span class="label">Purse</span>
+            <div class="num" style="font-size:21px;margin-top:3px">$85,000</div>
+          </div>
+        </div>
+
+        <div class="canvas">
+          <div class="detail">
+
+            <div style="display:grid;gap:18px">
+              <div class="panel">
+                <div class="panel-head"><span class="label">Conditions as written</span>
+                  <span class="label">Posted 08/02 13:54</span></div>
+                <div class="panel-body">
+                  <div class="condfull">
+                    ALLOWANCE. Purse $85,000. FOR MAIDENS, FILLIES AND MARES THREE YEARS OLD AND
+                    UPWARD. Weight, 121 lbs. (Preference to horses that have not started for less
+                    than $50,000.) Six Furlongs. (Dirt)
+                  </div>
+                  <div class="kv">
+                    <div><span class="label k">Race type</span><span class="v">Allowance</span></div>
+                    <div><span class="label k">Distance · surface</span><span class="v">6f · Dirt</span></div>
+                    <div><span class="label k">Sex / age</span><span class="v">F&amp;M · 3yo+</span></div>
+                    <div><span class="label k">Weight</span><span class="v">121 lbs.</span></div>
+                    <div><span class="label k">Entry close</span><span class="v">08/11 10:00 CT</span></div>
+                    <div><span class="label k">Post time</span><span class="v">5:15 PM CT</span></div>
+                    <div><span class="label k">Spots</span><span class="v">12 · 8 filled</span></div>
+                    <div><span class="label k">Also eligible</span><span class="v">4 places</span></div>
+                  </div>
+                </div>
+              </div>
+
+              <div class="panel">
+                <div class="panel-head"><span class="label">Condition check · Sabine Pass</span>
+                  <span class="tag tag-gold">1 flagged</span></div>
+                <div class="panel-body">
+                  <div class="check pass"><span class="mk">✓</span><span>Filly, 4yo — meets sex and age
+                    <span class="cl">FILLIES AND MARES THREE YEARS OLD AND UPWARD</span></span></div>
+                  <div class="check pass"><span class="mk">✓</span><span>Maiden — 1 career win is a maiden-claiming score, still eligible
+                    <span class="cl">FOR MAIDENS</span></span></div>
+                  <div class="check pass"><span class="mk">✓</span><span>Jockey Club registry on file
+                    <span class="cl">BREED REGISTRY</span></span></div>
+                  <div class="check pass"><span class="mk">✓</span><span>Not on the vet's list
+                    <span class="cl">VET'S LIST</span></span></div>
+                  <div class="check flag"><span class="mk">!</span><span>Last started for $25,000 — preferred entries fill first
+                    <span class="cl">PREFERENCE TO HORSES THAT HAVE NOT STARTED FOR LESS THAN $50,000</span></span></div>
+                  <div class="notice" style="margin-top:14px">
+                    <b>Flagged, not ruled.</b>The preference clause decides who draws in if the race
+                    overfills, and the racing office makes that call. You may submit anyway — the flags
+                    are stored on the record so the office sees what you saw.
+                  </div>
+                </div>
+              </div>
+            </div>
+
+            <div class="panel" style="align-self:start">
+              <div class="panel-head"><span class="label">Submit an entry</span></div>
+              <div class="panel-body">
+                <div class="field">
+                  <span class="label">Horse</span>
+                  <div class="control"><span>Sabine Pass · 4yo F</span><span class="caret">▾</span></div>
+                </div>
+                <div class="field">
+                  <span class="label">Jockey — required</span>
+                  <div class="control"><span>Geroux, F. · agent on file</span><span class="caret">▾</span></div>
+                </div>
+                <div class="field">
+                  <span class="label">Equipment — advisory</span>
+                  <div class="control"><span>Blinkers on</span><span class="caret">▾</span></div>
+                </div>
+                <div class="field">
+                  <span class="label">Designation</span>
+                  <div class="control"><span>Main entry · AE / MTO available</span><span class="caret">▾</span></div>
+                </div>
+                <div class="field">
+                  <span class="label">Note to the racing office</span>
+                  <div class="control" style="min-height:64px;align-items:flex-start;color:var(--ink-3)">
+                    <span>Optional — read the preference clause differently? Say so here.</span>
+                  </div>
+                </div>
+                <hr class="rule" style="margin:16px 0">
+                <button class="btn btn-primary btn-lg" style="width:100%;justify-content:center">
+                  Submit anyway →
+                </button>
+                <div style="margin-top:10px;text-align:center">
+                  <span class="label">A person at Ellis Park accepts or declines</span>
+                </div>
+              </div>
+            </div>
+
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div class="docfoot">
+  <p><strong>How to read these.</strong> One markup, three themes — every difference between the
+    directions is a CSS custom property, so the screens are comparable like for like. Nothing here is
+    wired to <code>app/</code>; no gates run against this file.</p>
+  <p style="margin-top:10px"><strong>What each direction commits to.</strong>
+    <em>Paddock</em> keeps the current palette and changes only the typography — cheapest to adopt,
+    least distinctive.
+    <em>Condition Book</em> is the partner's treatment: parchment ground, forest-green chrome, gold
+    and oxblood accents.
+    <em>Racing Form</em> pushes to newsprint — no round corners, ruled tables, tighter rows, gold on
+    near-black chrome. Most characterful, most work to hold consistent across every screen.</p>
+  <p style="margin-top:10px"><strong>Rule 0 holds.</strong> Nothing on these screens rates, ranks, or
+    forecasts. Records, earnings, spots, and timestamps are facts; the preference clause is flagged
+    and never ruled on.</p>
+</div>
+
+<script>
+  (function () {
+    var blurbs = {
+      a: 'Current palette · classic typography only',
+      b: "Parchment + forest green · the partner's treatment",
+      c: 'Newsprint density · ruled tables · no round corners'
+    };
+    var root = document.documentElement;
+    var btns = Array.prototype.slice.call(document.querySelectorAll('.swbtn'));
+    function set(v) {
+      root.setAttribute('data-variant', v);
+      btns.forEach(function (b) { b.setAttribute('aria-pressed', String(b.dataset.set === v)); });
+      document.getElementById('blurb').textContent = blurbs[v];
+      try { location.hash = v; } catch (e) {}
+    }
+    btns.forEach(function (b) { b.addEventListener('click', function () { set(b.dataset.set); }); });
+    var start = (location.hash || '').replace('#', '');
+    set(blurbs[start] ? start : 'b');
+  })();
+</script>
+</body>
+</html>

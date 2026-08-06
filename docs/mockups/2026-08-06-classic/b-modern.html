@@ -1,0 +1,1248 @@
+<!doctype html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PostParade — direction B, modern pass</title>
+<meta name="description" content="Variant B's palette — parchment and forest green — with modern UI structure: rounded cards, list views, info boxes, stat tiles, segmented controls.">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<style>
+/* ==========================================================================
+   PostParade — direction B, modern pass (2026-08-06)
+
+   Same palette as B · Condition Book in index.html. Different structure:
+   rounded cards and controls, list views instead of ruled tables, info boxes
+   instead of bare notices, stat tiles, segmented controls, soft shadows.
+
+   The classic anchor that survives: Source Serif for display headings, and
+   monospace reserved for data that wants to line up — times, money, records,
+   and the condition text itself. Everything else is Inter.
+
+   STATIC MOCKUP. Not wired to app/. Rule 0 holds: nothing rates or forecasts.
+   ========================================================================== */
+
+*, *::before, *::after { box-sizing: border-box; }
+
+:root {
+  /* palette — identical to variant B */
+  --ground: #f2efe6; --panel: #fffdf8; --panel-2: #f7f4ea; --panel-3: #edE8db;
+  --ink: #1d2620; --ink-2: #55605a; --ink-3: #8b948d;
+  --rule: #e3ddcd; --rule-2: #d3cbb6;
+  --chrome: #24402f; --chrome-ink: #eee9dc; --chrome-ink-2: #9db3a5;
+  --chrome-active: #1a3123;
+  --accent: #24402f; --accent-2: #386b4c; --accent-3: #4c8a63; --accent-soft: #e6ede7;
+  --second: #2f4858; --second-soft: #e8eef2;
+  --gold: #96701f; --gold-2: #b8862b; --gold-soft: #f7f0dc;
+  --alarm: #7b2418; --alarm-2: #a13a26; --alarm-soft: #f8ece7;
+
+  /* modern surface language */
+  --r-lg: 16px; --r-md: 12px; --r-sm: 9px; --r-pill: 999px;
+  --sh-sm: 0 1px 2px rgba(29,38,32,.06);
+  --sh-md: 0 1px 3px rgba(29,38,32,.05), 0 8px 20px -12px rgba(29,38,32,.18);
+  --sh-lg: 0 1px 3px rgba(29,38,32,.05), 0 18px 40px -20px rgba(29,38,32,.28);
+
+  --serif: 'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+  --sans: Inter, system-ui, -apple-system, sans-serif;
+  --mono: 'JetBrains Mono', ui-monospace, Menlo, monospace;
+}
+
+body {
+  margin: 0; background: var(--ground); color: var(--ink);
+  font-family: var(--sans); font-size: 14.5px; line-height: 1.55;
+  -webkit-font-smoothing: antialiased;
+}
+a { color: inherit; text-decoration: none; }
+h1, h2, h3, h4 { font-family: var(--serif); font-weight: 600; margin: 0; letter-spacing: -.015em; }
+.mono, .num { font-family: var(--mono); font-variant-numeric: tabular-nums; }
+
+/* ---- primitives --------------------------------------------------------- */
+.label { font-size: 12px; font-weight: 500; color: var(--ink-3); letter-spacing: .01em; }
+.card { background: var(--panel); border: 1px solid var(--rule); border-radius: var(--r-lg);
+  box-shadow: var(--sh-md); }
+.card-pad { padding: 20px 22px; }
+.card-head { display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 16px 22px 0; }
+.card-head h3 { font-size: 17px; }
+
+.pill {
+  display: inline-flex; align-items: center; gap: 6px; border-radius: var(--r-pill);
+  font-size: 12px; font-weight: 500; padding: 4px 11px; line-height: 1.5;
+}
+.pill-accent { background: var(--accent-soft); color: var(--accent-2); }
+.pill-gold { background: var(--gold-soft); color: var(--gold); }
+.pill-alarm { background: var(--alarm-soft); color: var(--alarm); }
+.pill-quiet { background: var(--panel-3); color: var(--ink-2); }
+.pill-solid { background: var(--accent); color: #fff; }
+.pill-dot::before { content: ""; width: 6px; height: 6px; border-radius: 999px;
+  background: currentColor; flex: none; }
+
+.btn {
+  display: inline-flex; align-items: center; justify-content: center; gap: 8px;
+  font-family: var(--sans); font-size: 14px; font-weight: 500; padding: 9px 16px;
+  border-radius: var(--r-sm); border: 1px solid var(--rule-2); background: var(--panel);
+  color: var(--ink); cursor: pointer; box-shadow: var(--sh-sm);
+}
+.btn:hover { border-color: var(--ink-3); }
+.btn-primary { background: var(--accent); border-color: var(--accent); color: #fff; }
+.btn-primary:hover { background: var(--accent-2); border-color: var(--accent-2); }
+.btn-ghost { background: transparent; border-color: transparent; box-shadow: none; color: var(--accent-2); }
+.btn-ghost:hover { background: var(--accent-soft); border-color: transparent; }
+.btn-sm { font-size: 13px; padding: 7px 12px; }
+.btn-lg { font-size: 15px; padding: 12px 20px; }
+
+.ico { width: 16px; height: 16px; flex: none; stroke: currentColor; fill: none;
+  stroke-width: 1.9; stroke-linecap: round; stroke-linejoin: round; }
+
+/* info box — the modern replacement for the bare notice line */
+.info {
+  display: flex; gap: 12px; align-items: flex-start; padding: 14px 16px;
+  border-radius: var(--r-md); background: var(--gold-soft); color: var(--gold);
+  border: 1px solid rgba(150,112,31,.22);
+}
+.info .ico { margin-top: 2px; }
+.info b { display: block; color: var(--gold); margin-bottom: 2px; font-weight: 600; }
+.info span { color: #6f5417; }
+.info.accent { background: var(--accent-soft); color: var(--accent-2);
+  border-color: rgba(56,107,76,.22); }
+.info.accent b, .info.accent span { color: var(--accent-2); }
+.info.alarm { background: var(--alarm-soft); color: var(--alarm);
+  border-color: rgba(123,36,24,.2); }
+.info.alarm b, .info.alarm span { color: var(--alarm); }
+
+/* segmented control */
+.seg { display: inline-flex; padding: 4px; gap: 4px; background: var(--panel-3);
+  border-radius: var(--r-sm); }
+.seg a { padding: 7px 14px; border-radius: 7px; font-size: 13.5px; font-weight: 500;
+  color: var(--ink-2); }
+.seg a .c { color: var(--ink-3); font-weight: 400; }
+.seg a.on { background: var(--panel); color: var(--ink); box-shadow: var(--sh-sm); }
+
+/* rounded progress */
+.meter { height: 6px; border-radius: 999px; background: var(--panel-3); overflow: hidden; }
+.meter span { display: block; height: 100%; border-radius: 999px; background: var(--accent-3); }
+.meter.gold span { background: var(--gold-2); }
+
+/* ==== page scaffolding =================================================== */
+.page-head { background: var(--chrome); color: var(--chrome-ink); padding: 30px 0 26px; }
+.page-head .wrap, .switch .wrap { max-width: 1340px; margin: 0 auto; padding: 0 28px; }
+.page-head h1 { font-size: 30px; color: var(--chrome-ink); margin-top: 8px; }
+.page-head p { margin: 10px 0 0; color: var(--chrome-ink-2); max-width: 66ch; }
+.switch { background: var(--chrome); border-bottom: 1px solid #35513f; padding: 0 0 18px; }
+.switch .wrap { display: flex; gap: 10px; flex-wrap: wrap; align-items: center; }
+.switch a { font-size: 13.5px; padding: 8px 15px; border-radius: var(--r-pill);
+  border: 1px solid #35513f; color: var(--chrome-ink-2); }
+.switch a.on { background: var(--chrome-active); color: #fff; border-color: var(--chrome-ink-2); }
+
+.note { max-width: 1340px; margin: 0 auto; padding: 46px 28px 16px; }
+.note h2 { font-size: 22px; }
+.note p { margin: 7px 0 0; color: var(--ink-2); max-width: 76ch; }
+.note .label { display: block; margin-bottom: 7px; }
+.frame { max-width: 1340px; margin: 0 auto 14px; padding: 0 28px; }
+.screen { border: 1px solid var(--rule-2); border-radius: var(--r-lg); overflow: hidden;
+  box-shadow: var(--sh-lg); background: var(--ground); }
+
+/* ==== app chrome ========================================================= */
+.app { display: grid; grid-template-columns: 226px 1fr; min-height: 580px; }
+.side { background: var(--chrome); color: var(--chrome-ink); padding: 18px 12px; }
+.side .brand { display: flex; align-items: center; gap: 10px; padding: 0 8px 16px; }
+.side .mark { width: 32px; height: 32px; border-radius: var(--r-sm); background: #16281d;
+  display: grid; place-items: center; color: #7fd6a3; }
+.side .brand .nm { display: block; font-family: var(--serif); font-weight: 600; font-size: 16px;
+  color: #fff; line-height: 1.25; }
+.side .brand .sb { display: block; font-size: 11.5px; color: var(--chrome-ink-2); }
+.side .user { display: flex; align-items: center; gap: 10px; padding: 10px 8px; margin-bottom: 12px;
+  border-radius: var(--r-md); background: rgba(255,255,255,.05); }
+.side .user .av { width: 30px; height: 30px; border-radius: 999px; background: var(--accent-3);
+  color: #fff; display: grid; place-items: center; font-size: 12px; font-weight: 600; }
+.side .user .n { display: block; font-size: 13.5px; color: #fff; line-height: 1.3; }
+.side .user .m { display: block; font-size: 11.5px; color: var(--chrome-ink-2); }
+.nav { display: grid; gap: 2px; }
+.nav a { display: flex; align-items: center; gap: 11px; padding: 9px 12px; border-radius: var(--r-sm);
+  color: var(--chrome-ink-2); font-size: 14px; }
+.nav a:hover { background: rgba(255,255,255,.05); color: var(--chrome-ink); }
+.nav a.on { background: var(--chrome-active); color: #fff; font-weight: 500; }
+.nav .badge { margin-left: auto; font-size: 11px; background: var(--gold-2); color: #fff;
+  border-radius: 999px; padding: 1px 7px; font-weight: 600; }
+
+.main { background: var(--ground); display: flex; flex-direction: column; }
+.topbar { display: flex; align-items: center; gap: 14px; padding: 12px 24px;
+  background: var(--panel); border-bottom: 1px solid var(--rule); }
+.searchbox { flex: 1; max-width: 400px; display: flex; align-items: center; gap: 9px;
+  padding: 9px 13px; border-radius: var(--r-pill); background: var(--panel-2);
+  border: 1px solid var(--rule); color: var(--ink-3); font-size: 13.5px; }
+.topbar .right { margin-left: auto; display: flex; align-items: center; gap: 14px; }
+.iconbtn { width: 34px; height: 34px; border-radius: 999px; display: grid; place-items: center;
+  border: 1px solid var(--rule); background: var(--panel); color: var(--ink-2); position: relative; }
+.iconbtn .dot { position: absolute; top: 6px; right: 7px; width: 7px; height: 7px;
+  border-radius: 999px; background: var(--gold-2); border: 1.5px solid var(--panel); }
+
+.hero-head { padding: 24px 26px 20px; display: flex; align-items: flex-end;
+  justify-content: space-between; gap: 18px; flex-wrap: wrap; }
+.hero-head h2 { font-size: 28px; }
+.hero-head .label { display: block; margin-bottom: 3px; }
+.canvas { padding: 4px 26px 30px; display: grid; gap: 20px; }
+
+/* ---- stat tiles --------------------------------------------------------- */
+.tiles { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(190px, 1fr)); }
+.tile { background: var(--panel); border: 1px solid var(--rule); border-radius: var(--r-lg);
+  padding: 18px 20px; box-shadow: var(--sh-sm); }
+.tile .t { display: flex; align-items: center; gap: 8px; color: var(--ink-2); font-size: 13.5px; }
+.tile .t .ico { width: 15px; height: 15px; color: var(--accent-3); }
+.tile .v { font-family: var(--serif); font-size: 32px; font-weight: 600; line-height: 1.1;
+  margin-top: 10px; }
+.tile .s { font-size: 12.5px; color: var(--ink-3); margin-top: 3px; }
+.tile .meter { margin-top: 12px; }
+
+/* ---- list view ---------------------------------------------------------- */
+.list { display: grid; }
+.list .row {
+  display: grid; align-items: center; gap: 16px; padding: 14px 22px;
+  grid-template-columns: 1fr auto; border-top: 1px solid var(--rule);
+}
+.list .row:first-child { border-top: 0; }
+.list .row:hover { background: var(--panel-2); }
+.list .lead { display: flex; align-items: center; gap: 13px; min-width: 0; }
+.av-round { width: 38px; height: 38px; border-radius: 999px; flex: none; display: grid;
+  place-items: center; background: var(--accent-soft); color: var(--accent-2);
+  font-family: var(--serif); font-weight: 600; font-size: 15px; border: 1px solid rgba(56,107,76,.18); }
+.av-round.gold { background: var(--gold-soft); color: var(--gold); border-color: rgba(150,112,31,.2); }
+.av-round.quiet { background: var(--panel-3); color: var(--ink-3); border-color: var(--rule); }
+.lead .nm { font-family: var(--serif); font-size: 17px; font-weight: 600; line-height: 1.25; }
+.lead .mt { font-size: 12.5px; color: var(--ink-3); margin-top: 2px; }
+.cols { display: flex; align-items: center; gap: 26px; flex-wrap: wrap; justify-content: flex-end; }
+.col { min-width: 96px; }
+.col .k { font-size: 11.5px; color: var(--ink-3); }
+.col .v { font-size: 14px; margin-top: 2px; }
+.col .v.num { font-size: 14px; }
+.chev { color: var(--ink-3); }
+@media (max-width: 1080px) { .list .row { grid-template-columns: 1fr; } .cols { justify-content: flex-start; } }
+
+/* ---- landing ------------------------------------------------------------ */
+.lnav { display: flex; align-items: center; gap: 24px; padding: 16px 26px; background: var(--panel);
+  border-bottom: 1px solid var(--rule); flex-wrap: wrap; }
+.lnav .mark { width: 32px; height: 32px; border-radius: var(--r-sm); background: var(--chrome);
+  display: grid; place-items: center; color: #7fd6a3; }
+.lnav .nm { font-family: var(--serif); font-weight: 600; font-size: 17px; }
+.lnav .links { display: flex; gap: 22px; margin-left: auto; font-size: 14px; color: var(--ink-2);
+  flex-wrap: wrap; align-items: center; }
+.hero { padding: 60px 26px 52px; display: grid; gap: 44px; grid-template-columns: 1.02fr .98fr;
+  align-items: center;
+  background:
+    radial-gradient(900px 460px at 88% -14%, rgba(56,107,76,.16), transparent 62%),
+    radial-gradient(700px 420px at -8% 24%, rgba(184,134,43,.13), transparent 60%),
+    var(--ground);
+}
+@media (max-width: 960px) { .hero { grid-template-columns: 1fr; } }
+.hero h2 { font-size: clamp(32px, 4vw, 48px); line-height: 1.08; }
+.hero h2 em { font-style: italic; color: var(--accent-2); }
+.hero .lede { font-size: 17.5px; color: var(--ink-2); margin: 18px 0 0; max-width: 40em; }
+.hero .cta { display: flex; gap: 12px; margin-top: 26px; flex-wrap: wrap; }
+.hero .assure { display: flex; gap: 20px; margin-top: 22px; flex-wrap: wrap;
+  font-size: 13px; color: var(--ink-3); }
+.hero .assure span { display: inline-flex; align-items: center; gap: 7px; }
+.hero .assure .ico { width: 15px; height: 15px; color: var(--accent-3); }
+
+.loop { display: grid; gap: 18px; grid-template-columns: repeat(auto-fit, minmax(224px, 1fr));
+  padding: 44px 26px; background: var(--panel); border-top: 1px solid var(--rule); }
+.loop .step { background: var(--panel-2); border: 1px solid var(--rule); border-radius: var(--r-lg);
+  padding: 20px; }
+.loop .step .n { width: 30px; height: 30px; border-radius: 999px; background: var(--accent);
+  color: #fff; display: grid; place-items: center; font-size: 13.5px; font-weight: 600; }
+.loop .step h4 { font-size: 16.5px; margin: 12px 0 6px; }
+.loop .step p { margin: 0; font-size: 13.5px; color: var(--ink-2); }
+
+.circuit { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(210px, 1fr));
+  padding: 0 26px 44px; background: var(--panel); }
+.circuit .t { display: flex; align-items: center; gap: 12px; padding: 14px 16px;
+  border: 1px solid var(--rule); border-radius: var(--r-md); background: var(--panel-2); }
+.circuit .t .c { width: 44px; height: 30px; border-radius: var(--r-sm); background: var(--accent);
+  color: #fff; display: grid; place-items: center; font-family: var(--mono); font-size: 12px; }
+.circuit .t .n { font-size: 13.5px; }
+.circuit .t .n small { display: block; color: var(--ink-3); font-size: 12px; }
+
+/* ---- meet cards --------------------------------------------------------- */
+.meets { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(258px, 1fr)); }
+.meetcard { background: var(--panel); border: 1px solid var(--rule); border-radius: var(--r-lg);
+  padding: 16px 18px; box-shadow: var(--sh-sm); }
+.meetcard .hd { display: flex; align-items: center; gap: 9px; }
+.meetcard .code { font-family: var(--mono); font-size: 12px; background: var(--accent);
+  color: #fff; padding: 3px 8px; border-radius: var(--r-sm); }
+.meetcard .hd .pill { margin-left: auto; }
+.meetcard .nm { font-family: var(--serif); font-size: 17px; font-weight: 600; margin-top: 12px; }
+.meetcard .loc { font-size: 13px; color: var(--ink-3); }
+.meetcard .prog { display: flex; justify-content: space-between; font-size: 12.5px;
+  color: var(--ink-2); margin-top: 14px; }
+.meetcard .ft { margin-top: 14px; padding-top: 12px; border-top: 1px solid var(--rule); }
+.meetcard .ft .rc { font-size: 13.5px; margin-top: 3px; }
+.meetcard .ft .pz { font-family: var(--mono); font-size: 14px; color: var(--gold); margin-top: 4px; }
+
+/* ---- condition book ----------------------------------------------------- */
+.filters { display: flex; gap: 8px; flex-wrap: wrap; align-items: center; }
+.chip { font-size: 13px; padding: 7px 14px; border-radius: var(--r-pill);
+  border: 1px solid var(--rule-2); background: var(--panel); color: var(--ink-2); }
+.chip.on { background: var(--accent); border-color: var(--accent); color: #fff; }
+
+.racelist { display: grid; gap: 14px; }
+.racecard { background: var(--panel); border: 1px solid var(--rule); border-radius: var(--r-lg);
+  box-shadow: var(--sh-sm); overflow: hidden; }
+.racecard .top { display: grid; grid-template-columns: 52px 1fr auto; gap: 16px;
+  padding: 18px 20px; align-items: start; }
+.racecard .rn { width: 44px; height: 44px; border-radius: var(--r-md); background: var(--accent-soft);
+  color: var(--accent); display: grid; place-items: center; font-family: var(--serif);
+  font-size: 20px; font-weight: 700; }
+.racecard h4 { font-size: 18px; }
+.racecard .facts { display: flex; gap: 8px; flex-wrap: wrap; margin-top: 9px; }
+.racecard .right { text-align: right; display: grid; gap: 8px; justify-items: end; }
+.racecard .spots { font-size: 13px; color: var(--ink-2); }
+.racecard .spots b { font-family: var(--mono); color: var(--ink); }
+.racecard .meter { width: 116px; }
+.racecard .cond { margin: 0 20px 18px; padding: 13px 15px; border-radius: var(--r-md);
+  background: var(--panel-2); border: 1px solid var(--rule); font-family: var(--mono);
+  font-size: 11.5px; line-height: 1.75; color: var(--ink-2); }
+.racecard .foot { display: flex; align-items: center; justify-content: space-between; gap: 12px;
+  padding: 12px 20px; background: var(--panel-2); border-top: 1px solid var(--rule); flex-wrap: wrap; }
+@media (max-width: 820px) { .racecard .top { grid-template-columns: 44px 1fr; }
+  .racecard .right { grid-column: 2; justify-items: start; text-align: left; } }
+
+/* ---- race detail -------------------------------------------------------- */
+.detail { display: grid; gap: 20px; grid-template-columns: 1.5fr 1fr; align-items: start; }
+@media (max-width: 1000px) { .detail { grid-template-columns: 1fr; } }
+.condfull { font-family: var(--mono); font-size: 12.5px; line-height: 1.9; color: var(--ink);
+  background: var(--panel-2); border: 1px solid var(--rule); border-radius: var(--r-md);
+  padding: 16px 18px; }
+.kv { display: grid; grid-template-columns: repeat(auto-fit, minmax(136px, 1fr)); gap: 16px;
+  margin-top: 18px; }
+.kv .k { font-size: 12px; color: var(--ink-3); }
+.kv .v { font-family: var(--mono); font-size: 14px; margin-top: 3px; }
+.checklist { display: grid; gap: 10px; }
+.checkrow { display: flex; gap: 12px; align-items: flex-start; padding: 12px 14px;
+  border-radius: var(--r-md); background: var(--panel-2); border: 1px solid var(--rule); }
+.checkrow .mk { width: 22px; height: 22px; border-radius: 999px; flex: none; display: grid;
+  place-items: center; background: var(--accent-soft); color: var(--accent-2); }
+.checkrow.flag { background: var(--gold-soft); border-color: rgba(150,112,31,.22); }
+.checkrow.flag .mk { background: rgba(184,134,43,.2); color: var(--gold); }
+.checkrow .tx { font-size: 14px; }
+.checkrow .cl { font-family: var(--mono); font-size: 11px; color: var(--ink-3); margin-top: 4px;
+  display: block; }
+.field { margin-bottom: 14px; }
+.field .label { display: block; margin-bottom: 6px; }
+.control { display: flex; align-items: center; justify-content: space-between; gap: 10px;
+  padding: 11px 14px; border-radius: var(--r-sm); border: 1px solid var(--rule-2);
+  background: var(--panel); font-size: 14px; }
+.control .chev { color: var(--ink-3); }
+.textarea { min-height: 74px; align-items: flex-start; color: var(--ink-3); }
+
+.docfoot { max-width: 1340px; margin: 44px auto 0; padding: 26px 28px 60px;
+  border-top: 1px solid var(--rule); color: var(--ink-2); }
+.docfoot code { font-family: var(--mono); font-size: 12.5px; }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-flag" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></symbol>
+  <symbol id="i-chev" viewBox="0 0 24 24"><polyline points="9 18 15 12 9 6"/></symbol>
+  <symbol id="i-grid" viewBox="0 0 24 24"><rect x="3" y="3" width="7" height="7" rx="1.5"/><rect x="14" y="3" width="7" height="7" rx="1.5"/><rect x="3" y="14" width="7" height="7" rx="1.5"/><rect x="14" y="14" width="7" height="7" rx="1.5"/></symbol>
+  <symbol id="i-horse" viewBox="0 0 24 24"><path d="M4 19v-6a8 8 0 0 1 16 0v6"/><path d="M4 19h16"/><circle cx="9" cy="10" r="1"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+  <symbol id="i-msg" viewBox="0 0 24 24"><path d="M21 15a2 2 0 0 1-2 2H7l-4 4V5a2 2 0 0 1 2-2h14a2 2 0 0 1 2 2z"/></symbol>
+  <symbol id="i-gear" viewBox="0 0 24 24"><circle cx="12" cy="12" r="3"/><path d="M19.4 15a1.65 1.65 0 0 0 .33 1.82l.06.06a2 2 0 1 1-2.83 2.83l-.06-.06a1.65 1.65 0 0 0-1.82-.33 1.65 1.65 0 0 0-1 1.51V21a2 2 0 1 1-4 0v-.09A1.65 1.65 0 0 0 9 19.4a1.65 1.65 0 0 0-1.82.33l-.06.06a2 2 0 1 1-2.83-2.83l.06-.06a1.65 1.65 0 0 0 .33-1.82 1.65 1.65 0 0 0-1.51-1H3a2 2 0 1 1 0-4h.09A1.65 1.65 0 0 0 4.6 9a1.65 1.65 0 0 0-.33-1.82l-.06-.06a2 2 0 1 1 2.83-2.83l.06.06A1.65 1.65 0 0 0 9 4.6a1.65 1.65 0 0 0 1-1.51V3a2 2 0 1 1 4 0v.09a1.65 1.65 0 0 0 1 1.51 1.65 1.65 0 0 0 1.82-.33l.06-.06a2 2 0 1 1 2.83 2.83l-.06.06a1.65 1.65 0 0 0-.33 1.82V9a1.65 1.65 0 0 0 1.51 1H21a2 2 0 1 1 0 4h-.09a1.65 1.65 0 0 0-1.51 1z"/></symbol>
+  <symbol id="i-search" viewBox="0 0 24 24"><circle cx="11" cy="11" r="7"/><line x1="21" y1="21" x2="16.65" y2="16.65"/></symbol>
+  <symbol id="i-bell" viewBox="0 0 24 24"><path d="M18 8A6 6 0 0 0 6 8c0 7-3 9-3 9h18s-3-2-3-9"/><path d="M13.73 21a2 2 0 0 1-3.46 0"/></symbol>
+  <symbol id="i-arrow" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></symbol>
+</svg>
+
+<div class="page-head">
+  <div class="wrap">
+    <span class="label" style="color:var(--chrome-ink-2)">PostParade v2 · design exploration · 2026-08-06</span>
+    <h1>Direction B — modern pass</h1>
+    <p>Variant B's palette, unchanged: parchment ground, forest-green chrome, gold and oxblood
+      accents. What changes is the structure — rounded cards and controls, list views instead of
+      ruled tables, info boxes, stat tiles, segmented controls, soft shadows. Serif display headings
+      stay as the classic anchor; monospace is reserved for data that wants to line up.</p>
+  </div>
+</div>
+<div class="switch">
+  <div class="wrap">
+    <a href="index.html#b">← Original B (ruled / classic)</a>
+    <a class="on">B — modern pass</a>
+    <a href="index.html#a">Variant A</a>
+    <a href="index.html#c">Variant C</a>
+  </div>
+</div>
+
+<!-- ================= 1 · LANDING ================= -->
+<div class="note">
+  <span class="label">Screen 1 of 5</span>
+  <h2>Landing page</h2>
+  <p>Soft gradient wash instead of flat parchment, rounded cards, and the four-step loop as tiles
+    rather than ruled columns.</p>
+</div>
+<div class="frame"><div class="screen">
+
+  <div class="lnav">
+    <span class="mark"><svg class="ico"><use href="#i-flag"/></svg></span>
+    <span class="nm">PostParade</span>
+    <span class="pill pill-quiet">v2 · prototype</span>
+    <span class="links">
+      <span>How it works</span><span>Who it's for</span><span>Condition books</span><span>Pricing</span>
+      <button class="btn btn-primary btn-sm">Open the app</button>
+    </span>
+  </div>
+
+  <div class="hero">
+    <div>
+      <span class="pill pill-accent pill-dot">For trainers and racing offices</span>
+      <h2 style="margin-top:18px">Find the right race.<br><em>Every horse. Every week.</em></h2>
+      <p class="lede">Every condition book on your circuit in one place, each condition checked
+        against your horse, and every conflict flagged for a person at the racing office to rule on.
+        It does not rate horses or forecast races.</p>
+      <div class="cta">
+        <button class="btn btn-primary btn-lg">Open the app <svg class="ico"><use href="#i-arrow"/></svg></button>
+        <button class="btn btn-lg">See the office queue</button>
+      </div>
+      <div class="assure">
+        <span><svg class="ico"><use href="#i-check"/></svg>No setup</span>
+        <span><svg class="ico"><use href="#i-check"/></svg>Live sample data</span>
+        <span><svg class="ico"><use href="#i-check"/></svg>2 min to walk through</span>
+      </div>
+    </div>
+
+    <div class="card">
+      <div class="card-head">
+        <div style="display:flex;align-items:center;gap:9px">
+          <svg class="ico" style="color:var(--accent-2)"><use href="#i-book"/></svg>
+          <h3>Ellis Park · Race 3</h3>
+        </div>
+        <span class="pill pill-gold">4 spots open</span>
+      </div>
+      <div class="card-pad">
+        <div style="display:flex;gap:8px;flex-wrap:wrap">
+          <span class="pill pill-quiet">Allowance</span>
+          <span class="pill pill-quiet">6f · Dirt</span>
+          <span class="pill pill-quiet">$85,000</span>
+          <span class="pill pill-quiet">F&amp;M · 3yo+</span>
+        </div>
+        <div style="display:flex;justify-content:space-between;margin-top:14px;font-size:13px;color:var(--ink-2)">
+          <span>Sat Aug 14 · post 5:15 PM CT</span>
+          <span class="num">closes Tue 10:00</span>
+        </div>
+        <div class="meter" style="margin-top:8px"><span style="width:67%"></span></div>
+
+        <div class="condfull" style="margin-top:16px">
+          FOR MAIDENS, FILLIES AND MARES THREE YEARS OLD AND UPWARD. Weight, 121 lbs.
+          (Preference to horses that have not started for less than $50,000.)
+        </div>
+
+        <div class="checklist" style="margin-top:14px">
+          <div class="checkrow">
+            <span class="mk"><svg class="ico" style="width:13px;height:13px"><use href="#i-check"/></svg></span>
+            <span class="tx">Filly, 4yo — meets sex and age</span>
+          </div>
+          <div class="checkrow">
+            <span class="mk"><svg class="ico" style="width:13px;height:13px"><use href="#i-check"/></svg></span>
+            <span class="tx">Maiden — eligible</span>
+          </div>
+          <div class="checkrow flag">
+            <span class="mk"><svg class="ico" style="width:13px;height:13px"><use href="#i-alert"/></svg></span>
+            <span class="tx">Has started for $35,000 — preferred entries fill first
+              <span class="cl">CLAUSE 3 · PREFERENCE</span></span>
+          </div>
+        </div>
+
+        <div class="info" style="margin-top:14px">
+          <svg class="ico"><use href="#i-alert"/></svg>
+          <div><b>Flagged, not ruled.</b><span>Submit anyway — the racing office decides who draws in.</span></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="loop">
+    <div class="step"><span class="n">1</span><h4>The track publishes its book</h4>
+      <p>Every race, purse, surface, distance, the conditions as written, and how many spots it holds.</p></div>
+    <div class="step"><span class="n">2</span><h4>You read it and submit</h4>
+      <p>Filter by entry close, date, surface, type, or purse. Name a jockey, flag AE or MTO, submit.</p></div>
+    <div class="step"><span class="n">3</span><h4>The conditions get checked</h4>
+      <p>Sex, age, the maiden and non-winners ladders, claiming clauses, registry, vet's list.</p></div>
+    <div class="step"><span class="n">4</span><h4>The office accepts or declines</h4>
+      <p>A standard reason plus a comment. You see the reason, the comment, and the timestamp.</p></div>
+  </div>
+
+  <div class="circuit">
+    <div class="t"><span class="c">ELP</span><span class="n">Ellis Park<small>Henderson, KY</small></span></div>
+    <div class="t"><span class="c">SAR</span><span class="n">Saratoga<small>Saratoga Springs, NY</small></span></div>
+    <div class="t"><span class="c">EVD</span><span class="n">Evangeline Downs<small>Opelousas, LA</small></span></div>
+    <div class="t"><span class="c">DED</span><span class="n">Delta Downs<small>Vinton, LA</small></span></div>
+  </div>
+
+</div></div>
+
+<!-- ================= 2 · DASHBOARD ================= -->
+<div class="note">
+  <span class="label">Screen 2 of 5</span>
+  <h2>Trainer dashboard</h2>
+  <p>Stat tiles replace the three ruled panels; the oxblood deadline bar becomes an info box with a
+    list beneath it; today's racing becomes separate meet cards on the parchment ground.</p>
+</div>
+<div class="frame"><div class="screen"><div class="app">
+
+  <aside class="side">
+    <div class="brand">
+      <span class="mark"><svg class="ico"><use href="#i-flag"/></svg></span>
+      <span><span class="nm">PostParade</span><span class="sb">Trainer workspace</span></span>
+    </div>
+    <div class="user">
+      <span class="av">KL</span>
+      <span><span class="n">Kinnon LaRose</span><span class="m">Edit profile</span></span>
+    </div>
+    <nav class="nav">
+      <a class="on"><svg class="ico"><use href="#i-grid"/></svg>Dashboard</a>
+      <a><svg class="ico"><use href="#i-horse"/></svg>My horses</a>
+      <a><svg class="ico"><use href="#i-book"/></svg>Condition books</a>
+      <a><svg class="ico"><use href="#i-clock"/></svg>Entry windows</a>
+      <a><svg class="ico"><use href="#i-msg"/></svg>Messages<span class="badge">2</span></a>
+      <a><svg class="ico"><use href="#i-gear"/></svg>Account</a>
+    </nav>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="searchbox"><svg class="ico"><use href="#i-search"/></svg>Search horses, tracks, races…</div>
+      <div class="right">
+        <span class="iconbtn"><svg class="ico"><use href="#i-bell"/></svg><span class="dot"></span></span>
+        <span class="label">Kinnon LaRose Racing</span>
+      </div>
+    </div>
+
+    <div class="hero-head">
+      <div>
+        <span class="label">Thursday, August 6 2026</span>
+        <h2>Good afternoon, Kinnon.</h2>
+      </div>
+      <span class="pill pill-gold pill-dot">2 books close within 48 hours</span>
+    </div>
+
+    <div class="canvas">
+
+      <div class="tiles">
+        <div class="tile">
+          <div class="t"><svg class="ico"><use href="#i-horse"/></svg>In stable</div>
+          <div class="v">16</div>
+          <div class="s">11 without an open request</div>
+          <div class="meter"><span style="width:31%"></span></div>
+        </div>
+        <div class="tile">
+          <div class="t"><svg class="ico"><use href="#i-check"/></svg>Entered this week</div>
+          <div class="v">5</div>
+          <div class="s">3 accepted · 2 awaiting a decision</div>
+          <div class="meter"><span style="width:60%"></span></div>
+        </div>
+        <div class="tile">
+          <div class="t"><svg class="ico"><use href="#i-clock"/></svg>Closing soonest</div>
+          <div class="v" style="font-size:26px">2d 0h</div>
+          <div class="s">Ellis Park · closes 08/11 10:00 CT</div>
+          <div class="meter gold"><span style="width:82%"></span></div>
+        </div>
+        <div class="tile">
+          <div class="t"><svg class="ico"><use href="#i-msg"/></svg>Unread messages</div>
+          <div class="v">2</div>
+          <div class="s">Ellis Park · Saratoga</div>
+          <div class="meter"><span style="width:22%"></span></div>
+        </div>
+      </div>
+
+      <div class="info alarm">
+        <svg class="ico"><use href="#i-alert"/></svg>
+        <div><b>Two condition books close within 48 hours.</b>
+          <span>Ellis Park (9-race card, 08/14) and Saratoga (2-race card, 08/15). Submissions
+            after the close are not accepted by the racing office.</span></div>
+      </div>
+
+      <div class="card">
+        <div class="card-head">
+          <h3>Entry windows</h3>
+          <button class="btn btn-ghost btn-sm">View all <svg class="ico"><use href="#i-chev"/></svg></button>
+        </div>
+        <div class="list" style="margin-top:12px">
+          <div class="row">
+            <div class="lead">
+              <span class="av-round gold">EL</span>
+              <div>
+                <div class="nm">Ellis Park</div>
+                <div class="mt">9-race card · race day 08/14/2026</div>
+              </div>
+            </div>
+            <div class="cols">
+              <div class="col"><div class="k">Entries close</div><div class="v num">08/11 · 10:00</div></div>
+              <div class="col"><div class="k">Remaining</div><div class="v num" style="color:var(--alarm)">2d 0h</div></div>
+              <button class="btn btn-sm">Open book</button>
+            </div>
+          </div>
+          <div class="row">
+            <div class="lead">
+              <span class="av-round">SA</span>
+              <div>
+                <div class="nm">Saratoga</div>
+                <div class="mt">2-race card · race day 08/15/2026</div>
+              </div>
+            </div>
+            <div class="cols">
+              <div class="col"><div class="k">Entries close</div><div class="v num">08/12 · 10:00</div></div>
+              <div class="col"><div class="k">Remaining</div><div class="v num">3d 0h</div></div>
+              <button class="btn btn-sm">Open book</button>
+            </div>
+          </div>
+          <div class="row">
+            <div class="lead">
+              <span class="av-round quiet">EV</span>
+              <div>
+                <div class="nm">Evangeline Downs</div>
+                <div class="mt">8-race card · race day 08/16/2026</div>
+              </div>
+            </div>
+            <div class="cols">
+              <div class="col"><div class="k">Entries close</div><div class="v num">08/14 · 10:00</div></div>
+              <div class="col"><div class="k">Remaining</div><div class="v num">5d 0h</div></div>
+              <button class="btn btn-sm">Open book</button>
+            </div>
+          </div>
+        </div>
+      </div>
+
+      <div>
+        <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:14px">
+          <h3 style="font-size:17px">Today's racing</h3>
+          <span class="label">Your circuit · Thu Aug 6</span>
+        </div>
+        <div class="meets">
+          <div class="meetcard">
+            <div class="hd"><span class="code">ELP</span><span class="label">KY · dirt / turf</span>
+              <span class="pill pill-gold">Entries open</span></div>
+            <div class="nm">Ellis Park</div>
+            <div class="loc">Henderson, KY</div>
+            <div class="prog"><span>9-race card</span><span class="num">1st post 1:15 PM CT</span></div>
+            <div class="meter" style="margin-top:8px"><span style="width:34%"></span></div>
+            <div class="ft"><span class="label">Featured</span>
+              <div class="rc">R5 · Claiming $22,000 · 6f Dirt</div>
+              <div class="pz">$27,500</div></div>
+          </div>
+          <div class="meetcard">
+            <div class="hd"><span class="code">SAR</span><span class="label">NY · dirt / turf</span>
+              <span class="pill pill-accent pill-dot">Racing</span></div>
+            <div class="nm">Saratoga Race Course</div>
+            <div class="loc">Saratoga Springs, NY</div>
+            <div class="prog"><span>Race 5 of 9</span><span class="num">3:49 PM ET</span></div>
+            <div class="meter" style="margin-top:8px"><span style="width:56%"></span></div>
+            <div class="ft"><span class="label">Featured</span>
+              <div class="rc">R8 · Allowance Opt. Clm · 1m Turf</div>
+              <div class="pz">$105,000</div></div>
+          </div>
+          <div class="meetcard">
+            <div class="hd"><span class="code">EVD</span><span class="label">LA · dirt / turf</span>
+              <span class="pill pill-quiet">Between races</span></div>
+            <div class="nm">Evangeline Downs</div>
+            <div class="loc">Opelousas, LA</div>
+            <div class="prog"><span>Race 3 of 8</span><span class="num">7:20 PM CT</span></div>
+            <div class="meter" style="margin-top:8px"><span style="width:38%"></span></div>
+            <div class="ft"><span class="label">Featured</span>
+              <div class="rc">R7 · Allowance · 5½f Turf</div>
+              <div class="pz">$46,000</div></div>
+          </div>
+          <div class="meetcard">
+            <div class="hd"><span class="code">DED</span><span class="label">LA · dirt</span>
+              <span class="pill pill-alarm">Dark</span></div>
+            <div class="nm">Delta Downs</div>
+            <div class="loc">Vinton, LA</div>
+            <div class="prog"><span>Dark today</span><span class="num">—</span></div>
+            <div class="meter" style="margin-top:8px"><span style="width:0%"></span></div>
+            <div class="ft"><span class="label">Featured</span>
+              <div class="rc">Next card 08/09/2026</div>
+              <div class="pz">—</div></div>
+          </div>
+        </div>
+        <div class="label" style="margin-top:12px;text-align:right;display:block">
+          Illustrative card data · not a system of record
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div></div></div>
+
+<!-- ================= 3 · MY HORSES ================= -->
+<div class="note">
+  <span class="label">Screen 3 of 5</span>
+  <h2>My Horses — list view</h2>
+  <p>The roster as a list rather than a table: a round silks avatar, the horse and its breeding on
+    the left, the facts as labelled columns on the right, one action per row. Reads at a glance and
+    reflows to a single column on narrow screens instead of scrolling sideways.</p>
+</div>
+<div class="frame"><div class="screen"><div class="app">
+
+  <aside class="side">
+    <div class="brand">
+      <span class="mark"><svg class="ico"><use href="#i-flag"/></svg></span>
+      <span><span class="nm">PostParade</span><span class="sb">Trainer workspace</span></span>
+    </div>
+    <div class="user">
+      <span class="av">KL</span>
+      <span><span class="n">Kinnon LaRose</span><span class="m">Edit profile</span></span>
+    </div>
+    <nav class="nav">
+      <a><svg class="ico"><use href="#i-grid"/></svg>Dashboard</a>
+      <a class="on"><svg class="ico"><use href="#i-horse"/></svg>My horses</a>
+      <a><svg class="ico"><use href="#i-book"/></svg>Condition books</a>
+      <a><svg class="ico"><use href="#i-clock"/></svg>Entry windows</a>
+      <a><svg class="ico"><use href="#i-msg"/></svg>Messages<span class="badge">2</span></a>
+      <a><svg class="ico"><use href="#i-gear"/></svg>Account</a>
+    </nav>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="searchbox"><svg class="ico"><use href="#i-search"/></svg>Search horses, tracks, races…</div>
+      <div class="right">
+        <span class="iconbtn"><svg class="ico"><use href="#i-bell"/></svg><span class="dot"></span></span>
+        <span class="label">Kinnon LaRose Racing</span>
+      </div>
+    </div>
+
+    <div class="hero-head">
+      <div>
+        <span class="label">Stable roster · 16 horses</span>
+        <h2>My horses</h2>
+      </div>
+      <button class="btn btn-primary">+ Add horse</button>
+    </div>
+
+    <div class="canvas">
+      <div style="display:flex;align-items:center;justify-content:space-between;gap:16px;flex-wrap:wrap">
+        <div class="seg">
+          <a class="on">All <span class="c">16</span></a>
+          <a>Without an entry <span class="c">11</span></a>
+          <a>Entered <span class="c">5</span></a>
+          <a>Unraced <span class="c">3</span></a>
+        </div>
+        <div class="filters">
+          <span class="chip">Sort: name</span>
+          <span class="chip">Filter</span>
+        </div>
+      </div>
+
+      <div class="card">
+        <div class="list">
+
+          <div class="row">
+            <div class="lead">
+              <span class="av-round">M</span>
+              <div>
+                <div class="nm">Modo</div>
+                <div class="mt">5yo mare · bay · TX bred · Liam's Map — Academy Road</div>
+              </div>
+            </div>
+            <div class="cols">
+              <div class="col"><div class="k">Record</div><div class="v num">12 sts · 6–2–1</div></div>
+              <div class="col"><div class="k">Earnings</div><div class="v num">$318,450</div></div>
+              <div class="col" style="min-width:150px"><div class="k">Last start</div>
+                <div class="v">1st of 9 · Bluebonnet S.</div></div>
+              <div class="col" style="min-width:140px"><div class="k">Next entry</div>
+                <div class="v"><span class="pill pill-accent">ELP R6 · 08/14</span></div></div>
+              <svg class="ico chev"><use href="#i-chev"/></svg>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="lead">
+              <span class="av-round">C</span>
+              <div>
+                <div class="nm">Carbone</div>
+                <div class="mt">5yo gelding · dk b/br · KY bred · Munnings — Coastal Kiss</div>
+              </div>
+            </div>
+            <div class="cols">
+              <div class="col"><div class="k">Record</div><div class="v num">15 sts · 4–3–2</div></div>
+              <div class="col"><div class="k">Earnings</div><div class="v num">$286,900</div></div>
+              <div class="col" style="min-width:150px"><div class="k">Last start</div>
+                <div class="v">1st of 8 · Alw 62k · ELP</div></div>
+              <div class="col" style="min-width:140px"><div class="k">Next entry</div>
+                <div class="v"><span class="pill pill-accent">SAR R4 · accepted</span></div></div>
+              <svg class="ico chev"><use href="#i-chev"/></svg>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="lead">
+              <span class="av-round">O</span>
+              <div>
+                <div class="nm">Oscar's Hope</div>
+                <div class="mt">3yo colt · bay · KY bred · Constitution — Bright Vision</div>
+              </div>
+            </div>
+            <div class="cols">
+              <div class="col"><div class="k">Record</div><div class="v num">5 sts · 2–2–0</div></div>
+              <div class="col"><div class="k">Earnings</div><div class="v num">$214,300</div></div>
+              <div class="col" style="min-width:150px"><div class="k">Last start</div>
+                <div class="v">3rd of 9 · Alw 40k · ELP</div></div>
+              <div class="col" style="min-width:140px"><div class="k">Next entry</div>
+                <div class="v"><span class="pill pill-quiet">No open request</span></div></div>
+              <svg class="ico chev"><use href="#i-chev"/></svg>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="lead">
+              <span class="av-round gold">S</span>
+              <div>
+                <div class="nm">Standoutsensation</div>
+                <div class="mt">5yo mare · bay · KY bred · Into Mischief — Sensational Star</div>
+              </div>
+            </div>
+            <div class="cols">
+              <div class="col"><div class="k">Record</div><div class="v num">14 sts · 3–4–3</div></div>
+              <div class="col"><div class="k">Earnings</div><div class="v num">$396,500</div></div>
+              <div class="col" style="min-width:150px"><div class="k">Last start</div>
+                <div class="v">1st of 7 · Alw 45k · EVD</div></div>
+              <div class="col" style="min-width:140px"><div class="k">Next entry</div>
+                <div class="v"><span class="pill pill-gold">EVD R3 · flagged</span></div></div>
+              <svg class="ico chev"><use href="#i-chev"/></svg>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="lead">
+              <span class="av-round">E</span>
+              <div>
+                <div class="nm">Eye Dee Kay</div>
+                <div class="mt">7yo gelding · chestnut · KY bred · Kantharos — Dee's Delight</div>
+              </div>
+            </div>
+            <div class="cols">
+              <div class="col"><div class="k">Record</div><div class="v num">27 sts · 5–6–4</div></div>
+              <div class="col"><div class="k">Earnings</div><div class="v num">$402,100</div></div>
+              <div class="col" style="min-width:150px"><div class="k">Last start</div>
+                <div class="v">1st of 9 · Alw 44k · DED</div></div>
+              <div class="col" style="min-width:140px"><div class="k">Next entry</div>
+                <div class="v"><span class="pill pill-quiet">No open request</span></div></div>
+              <svg class="ico chev"><use href="#i-chev"/></svg>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="lead">
+              <span class="av-round gold">S</span>
+              <div>
+                <div class="nm">Sabine Pass</div>
+                <div class="mt">4yo filly · gray/roan · KY bred · Gun Runner — Bayou Belle</div>
+              </div>
+            </div>
+            <div class="cols">
+              <div class="col"><div class="k">Record</div><div class="v num">9 sts · 1–2–1</div></div>
+              <div class="col"><div class="k">Earnings</div><div class="v num">$71,300</div></div>
+              <div class="col" style="min-width:150px"><div class="k">Last start</div>
+                <div class="v">4th of 10 · Clm 25k · DED</div></div>
+              <div class="col" style="min-width:140px"><div class="k">Next entry</div>
+                <div class="v"><span class="pill pill-gold">ELP R3 · flagged</span></div></div>
+              <svg class="ico chev"><use href="#i-chev"/></svg>
+            </div>
+          </div>
+
+          <div class="row">
+            <div class="lead">
+              <span class="av-round quiet">M</span>
+              <div>
+                <div class="nm">Midnight Still</div>
+                <div class="mt">2yo colt · dk b/br · KY bred · Nyquist — Quiet Evening</div>
+              </div>
+            </div>
+            <div class="cols">
+              <div class="col"><div class="k">Record</div><div class="v num">Unraced</div></div>
+              <div class="col"><div class="k">Earnings</div><div class="v num">$0</div></div>
+              <div class="col" style="min-width:150px"><div class="k">Last start</div>
+                <div class="v" style="color:var(--ink-3)">No starts</div></div>
+              <div class="col" style="min-width:140px"><div class="k">Next entry</div>
+                <div class="v"><span class="pill pill-quiet">Maiden races only</span></div></div>
+              <svg class="ico chev"><use href="#i-chev"/></svg>
+            </div>
+          </div>
+
+        </div>
+      </div>
+      <span class="label">Showing 7 of 16 · records and earnings from the horse's own past performances</span>
+    </div>
+  </div>
+</div></div></div>
+
+<!-- ================= 4 · CONDITION BOOK ================= -->
+<div class="note">
+  <span class="label">Screen 4 of 5</span>
+  <h2>Condition book</h2>
+  <p>Each race is its own rounded card with a fill meter and a footer action, rather than rows ruled
+    apart. The condition text keeps its monospace box — that is the one place the classic reading
+    still beats the modern one.</p>
+</div>
+<div class="frame"><div class="screen"><div class="app">
+
+  <aside class="side">
+    <div class="brand">
+      <span class="mark"><svg class="ico"><use href="#i-flag"/></svg></span>
+      <span><span class="nm">PostParade</span><span class="sb">Trainer workspace</span></span>
+    </div>
+    <div class="user">
+      <span class="av">KL</span>
+      <span><span class="n">Kinnon LaRose</span><span class="m">Edit profile</span></span>
+    </div>
+    <nav class="nav">
+      <a><svg class="ico"><use href="#i-grid"/></svg>Dashboard</a>
+      <a><svg class="ico"><use href="#i-horse"/></svg>My horses</a>
+      <a class="on"><svg class="ico"><use href="#i-book"/></svg>Condition books</a>
+      <a><svg class="ico"><use href="#i-clock"/></svg>Entry windows</a>
+      <a><svg class="ico"><use href="#i-msg"/></svg>Messages<span class="badge">2</span></a>
+      <a><svg class="ico"><use href="#i-gear"/></svg>Account</a>
+    </nav>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="searchbox"><svg class="ico"><use href="#i-search"/></svg>Search horses, tracks, races…</div>
+      <div class="right">
+        <span class="iconbtn"><svg class="ico"><use href="#i-bell"/></svg><span class="dot"></span></span>
+        <span class="label">Kinnon LaRose Racing</span>
+      </div>
+    </div>
+
+    <div class="hero-head">
+      <div>
+        <span class="label">Ellis Park · summer meet</span>
+        <h2>Condition book — race day 08/14</h2>
+      </div>
+      <div style="display:flex;gap:10px;align-items:center">
+        <span class="pill pill-alarm pill-dot">Closes 08/11 · 10:00 CT</span>
+        <button class="btn btn-sm">See all conditions</button>
+      </div>
+    </div>
+
+    <div class="canvas">
+      <div class="filters">
+        <span class="chip on">All 9 races</span>
+        <span class="chip">Dirt</span>
+        <span class="chip">Turf</span>
+        <span class="chip">Maiden</span>
+        <span class="chip">Claiming</span>
+        <span class="chip">Allowance</span>
+        <span class="chip">Stakes</span>
+        <span class="chip">Spots open</span>
+      </div>
+
+      <div class="racelist">
+
+        <div class="racecard">
+          <div class="top">
+            <span class="rn">1</span>
+            <div>
+              <h4>Maiden Claiming $30,000</h4>
+              <div class="facts">
+                <span class="pill pill-quiet">6f · Dirt</span>
+                <span class="pill pill-quiet">Purse $34,000</span>
+                <span class="pill pill-quiet">F&amp;M · 3yo+</span>
+                <span class="pill pill-quiet">Post 5:15 PM</span>
+              </div>
+            </div>
+            <div class="right">
+              <span class="spots"><b>4</b> of 10 spots open</span>
+              <span class="meter"><span style="width:60%"></span></span>
+            </div>
+          </div>
+          <div class="cond">MAIDEN CLAIMING. Purse $34,000. FOR MAIDENS, FILLIES AND MARES THREE YEARS
+            OLD AND UPWARD. Weight, 121 lbs. Claiming Price $30,000. Six Furlongs. (Dirt)</div>
+          <div class="foot">
+            <span class="label">3 of your horses meet these conditions</span>
+            <button class="btn btn-primary btn-sm">Submit an entry</button>
+          </div>
+        </div>
+
+        <div class="racecard">
+          <div class="top">
+            <span class="rn">3</span>
+            <div>
+              <h4>Allowance</h4>
+              <div class="facts">
+                <span class="pill pill-quiet">6f · Dirt</span>
+                <span class="pill pill-quiet">Purse $85,000</span>
+                <span class="pill pill-quiet">F&amp;M · 3yo+</span>
+                <span class="pill pill-gold">Preference clause</span>
+              </div>
+            </div>
+            <div class="right">
+              <span class="spots"><b>4</b> of 12 spots open</span>
+              <span class="meter"><span style="width:67%"></span></span>
+            </div>
+          </div>
+          <div class="cond">ALLOWANCE. Purse $85,000. FOR MAIDENS, FILLIES AND MARES THREE YEARS OLD
+            AND UPWARD. Weight, 121 lbs. (Preference to horses that have not started for less than
+            $50,000.) Six Furlongs. (Dirt)</div>
+          <div style="margin:0 20px 16px">
+            <div class="info">
+              <svg class="ico"><use href="#i-alert"/></svg>
+              <div><b>Sabine Pass — preference clause flagged.</b>
+                <span>She has started for $25,000, so preferred entries fill first. You may submit
+                  anyway; the racing office decides who draws in.</span></div>
+            </div>
+          </div>
+          <div class="foot">
+            <span class="label">2 of your horses meet these conditions · 1 flagged</span>
+            <button class="btn btn-primary btn-sm">Submit an entry</button>
+          </div>
+        </div>
+
+        <div class="racecard">
+          <div class="top">
+            <span class="rn">5</span>
+            <div>
+              <h4>Claiming $22,000</h4>
+              <div class="facts">
+                <span class="pill pill-quiet">6f · Dirt</span>
+                <span class="pill pill-quiet">Purse $27,500</span>
+                <span class="pill pill-quiet">3yo+</span>
+                <span class="pill pill-accent">MTO allowed</span>
+              </div>
+            </div>
+            <div class="right">
+              <span class="spots"><b>2</b> of 10 spots open</span>
+              <span class="meter"><span style="width:80%"></span></span>
+            </div>
+          </div>
+          <div class="cond">CLAIMING. Purse $27,500. FOR THREE YEAR OLDS AND UPWARD WHICH HAVE NEVER
+            WON TWO RACES. Three Year Olds, 120 lbs.; Older, 124 lbs. Claiming Price $22,000.
+            Six Furlongs. (Dirt)</div>
+          <div class="foot">
+            <span class="label">1 of your horses meets these conditions</span>
+            <button class="btn btn-primary btn-sm">Submit an entry</button>
+          </div>
+        </div>
+
+        <div class="racecard">
+          <div class="top">
+            <span class="rn">8</span>
+            <div>
+              <h4>Groupie Doll Stakes · Gr. III</h4>
+              <div class="facts">
+                <span class="pill pill-quiet">7f · Dirt</span>
+                <span class="pill pill-gold">Purse $300,000</span>
+                <span class="pill pill-quiet">F&amp;M · 3yo+</span>
+                <span class="pill pill-quiet">Nomination required</span>
+              </div>
+            </div>
+            <div class="right">
+              <span class="spots"><b>6</b> of 14 spots open</span>
+              <span class="meter"><span style="width:57%"></span></span>
+            </div>
+          </div>
+          <div class="cond">STAKES. Purse $300,000. FOR FILLIES AND MARES THREE YEARS OLD AND UPWARD.
+            By subscription of $250 each, which should accompany the nomination. Seven Furlongs. (Dirt)</div>
+          <div class="foot">
+            <span class="label">Nomination closes 08/09 · none of your horses nominated</span>
+            <button class="btn btn-sm">Nominate</button>
+          </div>
+        </div>
+
+      </div>
+      <span class="label">Showing 4 of 9 races · condition books are illustrative demo data</span>
+    </div>
+  </div>
+</div></div></div>
+
+<!-- ================= 5 · RACE DETAIL ================= -->
+<div class="note">
+  <span class="label">Screen 5 of 5</span>
+  <h2>Race detail &amp; submission</h2>
+  <p>The checker's read becomes a checklist of tinted rows — a pass and a flag are legible at a
+    glance, and the flag never blocks the submit.</p>
+</div>
+<div class="frame"><div class="screen"><div class="app">
+
+  <aside class="side">
+    <div class="brand">
+      <span class="mark"><svg class="ico"><use href="#i-flag"/></svg></span>
+      <span><span class="nm">PostParade</span><span class="sb">Trainer workspace</span></span>
+    </div>
+    <div class="user">
+      <span class="av">KL</span>
+      <span><span class="n">Kinnon LaRose</span><span class="m">Edit profile</span></span>
+    </div>
+    <nav class="nav">
+      <a><svg class="ico"><use href="#i-grid"/></svg>Dashboard</a>
+      <a><svg class="ico"><use href="#i-horse"/></svg>My horses</a>
+      <a class="on"><svg class="ico"><use href="#i-book"/></svg>Condition books</a>
+      <a><svg class="ico"><use href="#i-clock"/></svg>Entry windows</a>
+      <a><svg class="ico"><use href="#i-msg"/></svg>Messages<span class="badge">2</span></a>
+      <a><svg class="ico"><use href="#i-gear"/></svg>Account</a>
+    </nav>
+  </aside>
+
+  <div class="main">
+    <div class="topbar">
+      <div class="searchbox"><svg class="ico"><use href="#i-search"/></svg>Search horses, tracks, races…</div>
+      <div class="right">
+        <span class="iconbtn"><svg class="ico"><use href="#i-bell"/></svg><span class="dot"></span></span>
+        <span class="label">Kinnon LaRose Racing</span>
+      </div>
+    </div>
+
+    <div class="hero-head">
+      <div>
+        <span class="label">Ellis Park · Sat Aug 14 · Race 3</span>
+        <h2>Allowance · 6 furlongs · dirt</h2>
+      </div>
+      <div style="text-align:right">
+        <span class="label">Purse</span>
+        <div class="num" style="font-size:22px;margin-top:2px">$85,000</div>
+      </div>
+    </div>
+
+    <div class="canvas">
+      <div class="detail">
+
+        <div style="display:grid;gap:20px">
+          <div class="card">
+            <div class="card-head">
+              <h3>Conditions as written</h3>
+              <span class="label">Posted 08/02 · 13:54</span>
+            </div>
+            <div class="card-pad">
+              <div class="condfull">
+                ALLOWANCE. Purse $85,000. FOR MAIDENS, FILLIES AND MARES THREE YEARS OLD AND UPWARD.
+                Weight, 121 lbs. (Preference to horses that have not started for less than $50,000.)
+                Six Furlongs. (Dirt)
+              </div>
+              <div class="kv">
+                <div><div class="k">Race type</div><div class="v">Allowance</div></div>
+                <div><div class="k">Distance · surface</div><div class="v">6f · Dirt</div></div>
+                <div><div class="k">Sex / age</div><div class="v">F&amp;M · 3yo+</div></div>
+                <div><div class="k">Weight</div><div class="v">121 lbs.</div></div>
+                <div><div class="k">Entry close</div><div class="v">08/11 10:00</div></div>
+                <div><div class="k">Post time</div><div class="v">5:15 PM CT</div></div>
+                <div><div class="k">Spots</div><div class="v">12 · 8 filled</div></div>
+                <div><div class="k">Also eligible</div><div class="v">4 places</div></div>
+              </div>
+            </div>
+          </div>
+
+          <div class="card">
+            <div class="card-head">
+              <h3>Condition check · Sabine Pass</h3>
+              <span class="pill pill-gold">1 flagged</span>
+            </div>
+            <div class="card-pad">
+              <div class="checklist">
+                <div class="checkrow">
+                  <span class="mk"><svg class="ico" style="width:13px;height:13px"><use href="#i-check"/></svg></span>
+                  <span class="tx">Filly, 4yo — meets sex and age
+                    <span class="cl">FILLIES AND MARES THREE YEARS OLD AND UPWARD</span></span>
+                </div>
+                <div class="checkrow">
+                  <span class="mk"><svg class="ico" style="width:13px;height:13px"><use href="#i-check"/></svg></span>
+                  <span class="tx">Maiden — her one win was a maiden-claiming score, still eligible
+                    <span class="cl">FOR MAIDENS</span></span>
+                </div>
+                <div class="checkrow">
+                  <span class="mk"><svg class="ico" style="width:13px;height:13px"><use href="#i-check"/></svg></span>
+                  <span class="tx">Jockey Club registry on file
+                    <span class="cl">BREED REGISTRY</span></span>
+                </div>
+                <div class="checkrow">
+                  <span class="mk"><svg class="ico" style="width:13px;height:13px"><use href="#i-check"/></svg></span>
+                  <span class="tx">Not on the vet's list
+                    <span class="cl">VET'S LIST</span></span>
+                </div>
+                <div class="checkrow flag">
+                  <span class="mk"><svg class="ico" style="width:13px;height:13px"><use href="#i-alert"/></svg></span>
+                  <span class="tx">Last started for $25,000 — preferred entries fill first
+                    <span class="cl">PREFERENCE TO HORSES THAT HAVE NOT STARTED FOR LESS THAN $50,000</span></span>
+                </div>
+              </div>
+              <div class="info" style="margin-top:16px">
+                <svg class="ico"><use href="#i-alert"/></svg>
+                <div><b>Flagged, not ruled.</b>
+                  <span>The preference clause decides who draws in if the race overfills, and the
+                    racing office makes that call. Submit anyway if you read the clause differently —
+                    the flags are stored on the record, so the office sees what you saw.</span></div>
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <div class="card">
+          <div class="card-head"><h3>Submit an entry</h3></div>
+          <div class="card-pad">
+            <div class="field">
+              <span class="label">Horse</span>
+              <div class="control"><span>Sabine Pass · 4yo filly</span>
+                <svg class="ico chev"><use href="#i-chev"/></svg></div>
+            </div>
+            <div class="field">
+              <span class="label">Jockey — required</span>
+              <div class="control"><span>Geroux, F. · agent on file</span>
+                <svg class="ico chev"><use href="#i-chev"/></svg></div>
+            </div>
+            <div class="field">
+              <span class="label">Equipment — advisory</span>
+              <div class="control"><span>Blinkers on</span>
+                <svg class="ico chev"><use href="#i-chev"/></svg></div>
+            </div>
+            <div class="field">
+              <span class="label">Designation</span>
+              <div class="control"><span>Main entry · AE / MTO available</span>
+                <svg class="ico chev"><use href="#i-chev"/></svg></div>
+            </div>
+            <div class="field">
+              <span class="label">Note to the racing office</span>
+              <div class="control textarea">
+                <span>Optional — read the preference clause differently? Say so here.</span>
+              </div>
+            </div>
+
+            <div class="info accent" style="margin-bottom:14px">
+              <svg class="ico"><use href="#i-clock"/></svg>
+              <div><b>2 days 0 hours to submit.</b>
+                <span>Entries close Tue 08/11 at 10:00 CT.</span></div>
+            </div>
+
+            <button class="btn btn-primary btn-lg" style="width:100%">
+              Submit anyway <svg class="ico"><use href="#i-arrow"/></svg>
+            </button>
+            <div class="label" style="text-align:center;margin-top:10px;display:block">
+              A person at Ellis Park accepts or declines
+            </div>
+          </div>
+        </div>
+
+      </div>
+    </div>
+  </div>
+</div></div></div>
+
+<div class="docfoot">
+  <p><strong>What changed from the original B.</strong> Palette, type family, and every colour value
+    are identical. The structure is not: rounded cards and controls replace hairline-ruled panels,
+    the roster is a list view rather than a table, notices became info boxes, the three dashboard
+    panels became stat tiles with meters, the tab strip became a segmented control, and the meets
+    grid became separate cards on the parchment ground.</p>
+  <p style="margin-top:10px"><strong>What stayed classic.</strong> Source Serif display headings,
+    and monospace on data that wants to line up — times, money, records, and the condition text,
+    which still reads better as a typed book than as UI copy.</p>
+  <p style="margin-top:10px"><strong>The trade.</strong> Modern structure costs vertical space:
+    seven horses here occupy roughly what nine did in the ruled table. If the roster is the screen
+    trainers live in, that matters — a density toggle on the list view would settle it.
+    Rule 0 holds: nothing here rates, ranks, or forecasts.</p>
+  <p style="margin-top:10px"><a href="index.html#b" style="color:var(--accent-2);font-weight:500">
+    ← Back to the three original variants</a></p>
+</div>
+
+</body>
+</html>

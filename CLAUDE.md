@@ -88,6 +88,33 @@ Do not weaken those guards to land a feature — bring the question to Phil.
    prefix table (and `exactRoutes`) in `app.html`; `wsForRoute` decides which
    workspace a deep link switches to.
 
+## Design system — direction B, modern pass (adopted 2026-08-06)
+
+Parchment ground, forest-green chrome, gold for advisory, oxblood for declines;
+rounded cards and controls, list views, info boxes, stat tiles, rounded meters.
+**Serif display headings** (Source Serif 4) are the classic anchor; **monospace
+is reserved for data that lines up** — times, money, records, and condition
+text. Everything else is Inter. Mockups that fixed the direction:
+[`docs/mockups/2026-08-06-classic/b-modern.html`](docs/mockups/2026-08-06-classic/b-modern.html)
+(the three earlier variants are in `index.html` beside it).
+
+How it is wired, and what that means for edits:
+
+1. **`app.html` remaps the built-in Tailwind scales** (`slate`, `emerald`,
+   `amber`, `red`, `indigo`, plus the horse-tint colours) onto the palette,
+   rather than replacing them. Existing utility classes across the screens
+   modules therefore carry the new palette automatically. Keep the ramp
+   direction when editing — 50 lightest, 900 darkest — or every screen shifts.
+2. **Shape and typography live in the component layer** in `app.html`'s
+   `<style>`: `.card`, `.tile` / `.tile-v`, `.list` / `.list-row` / `.list-col`,
+   `.info` (+ `.info-accent`, `.info-alarm`), `.checkrow` (+ `.flag`, `.hard`),
+   `.meter`, `.seg`, `.chip`, `.cond-text`. Prefer these over new one-off
+   utility stacks so the screens stay consistent.
+3. **`index.html` is self-contained** and repeats the palette by hand — it takes
+   no Tailwind. Change a colour in one file and change it in the other.
+4. Helpers that emit the components: `infoBox()`, `statTile()`, `spotsBar()` in
+   `app/render.js`.
+
 ## Brand tokens
 
 Page bg `#f7f8fa` (landing `#fbfaf7`) · ink `#0b1220 / #475569 / #94a3b8` ·

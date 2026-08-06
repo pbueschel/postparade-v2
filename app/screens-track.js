@@ -58,12 +58,11 @@
            ['Requests awaiting review', pending.length, 'inbox'],
            ['Races under minimum field', short.length, 'triangle-alert']]
           .map(([label, n, icon]) => `
-            <div class="card ring-soft p-4">
-              <div class="flex items-start justify-between">
-                <div class="text-xs text-ink-500">${esc(label)}</div>
-                <i data-lucide="${icon}" class="w-4 h-4 text-slate-300"></i>
+            <div class="tile">
+              <div class="flex items-center gap-2 text-sm text-ink-600">
+                <i data-lucide="${icon}" class="w-4 h-4 text-indigo-500"></i>${esc(label)}
               </div>
-              <div class="mt-1 text-2xl font-semibold tracking-tight">${n}</div>
+              <div class="tile-v">${n}</div>
             </div>`).join('')}
       </div>
 
@@ -271,16 +270,24 @@
             </div>
             ${s.note ? `<div class="mt-2 text-xs text-ink-600 italic">Trainer note: “${esc(s.note)}”</div>` : ''}
             ${res && res.conflicts.length ? `
-              <div class="mt-3 rounded-lg border ${res.eligible ? 'border-amber-100 bg-amber-50/50' : 'border-red-100 bg-red-50/50'} p-3">
-                <div class="text-xs font-medium ${res.eligible ? 'text-amber-800' : 'text-red-800'}">Condition check</div>
-                <ul class="mt-1 space-y-1">${res.conflicts.map((c) => `<li class="text-xs ${c.severity === 'hard' ? 'text-red-700' : 'text-amber-700'}"><strong>${esc(c.label)}.</strong> ${esc(c.detail)}</li>`).join('')}</ul>
-                <div class="text-[10px] text-ink-500 mt-1">Advisory. The office rules on eligibility, not the software.</div>
+              <div class="mt-3">
+                <div class="info ${res.eligible ? '' : 'info-alarm'}">
+                  <i data-lucide="alert-triangle" class="w-4 h-4"></i>
+                  <div><b>Condition check</b>
+                    <span>Advisory. The office rules on eligibility, not the software.</span></div>
+                </div>
+                <div class="mt-2">${res.conflicts.map((c) => `
+                  <div class="checkrow ${c.severity === 'hard' ? 'hard' : 'flag'}">
+                    <span class="mk"><i data-lucide="alert-triangle" class="w-3 h-3"></i></span>
+                    <span class="text-sm">${esc(c.detail)}<span class="cl">${esc(c.label).toUpperCase()}</span></span>
+                  </div>`).join('')}</div>
               </div>` : res ? `<div class="mt-3 text-xs text-emerald-700 flex items-center gap-1.5">
                 <i data-lucide="check-circle-2" class="w-3.5 h-3.5"></i>Meets every written condition.</div>` : ''}
-            ${reason ? `<div class="mt-3 rounded-lg bg-red-50 border border-red-100 p-3">
-              <div class="text-xs font-medium text-red-800">Declined — ${esc(reason.label)}</div>
-              ${s.denialComment ? `<div class="text-xs text-red-700 mt-0.5 italic">“${esc(s.denialComment)}”</div>` : ''}
-              <div class="text-[10px] text-red-600 mt-1 mono">${esc(s.decidedBy || 'racing office')} · ${esc(fmtStamp(s.decidedAt))}</div>
+            ${reason ? `<div class="mt-3 info info-alarm">
+              <i data-lucide="x-circle" class="w-4 h-4"></i>
+              <div><b>Declined — ${esc(reason.label)}</b>
+                ${s.denialComment ? `<span class="italic">“${esc(s.denialComment)}”</span>` : ''}
+                <span class="mono text-[11px] block mt-1">${esc(s.decidedBy || 'racing office')} · ${esc(fmtStamp(s.decidedAt))}</span></div>
             </div>` : ''}
           </div>
           <div class="flex flex-col gap-1.5 min-w-[8.5rem]">

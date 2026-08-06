@@ -6,54 +6,203 @@
 <title>PostParade — condition books, entries, and the racing office</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Source+Serif+4:opsz,wght@8..60,400;8..60,600;8..60,700&family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <script src="https://cdn.tailwindcss.com"></script>
 <script src="https://unpkg.com/lucide@latest/dist/umd/lucide.min.js"></script>
 <script>
+  /* Palette: parchment + forest green (direction B, modern pass — see
+     docs/mockups/2026-08-06-classic/b-modern.html). The built-in Tailwind
+     scales are REMAPPED rather than replaced, so the utility classes already
+     spread across the screens modules shift wholesale onto the new palette.
+     Keep the ramp direction intact when editing: 50 lightest, 900 darkest. */
   tailwind.config = {
     theme: {
       extend: {
-        fontFamily: { sans: ['Inter', 'system-ui', 'sans-serif'], mono: ['JetBrains Mono', 'monospace'] },
+        fontFamily: {
+          sans: ['Inter', 'system-ui', 'sans-serif'],
+          serif: ['Source Serif 4', 'Iowan Old Style', 'Georgia', 'serif'],
+          mono: ['JetBrains Mono', 'monospace'],
+        },
         colors: {
-          ink: { 900: '#0b1220', 800: '#11192b', 700: '#1a2336', 600: '#2a3447', 500: '#475569', 400: '#94a3b8' },
-          turf: { 50: '#ecfdf5', 100: '#d1fae5', 300: '#6ee7b7', 500: '#10b981', 600: '#059669', 700: '#047857', 800: '#065f46' },
-          silk: { 400: '#f59e0b', 500: '#d97706' },
+          /* warm neutrals — parchment through ink */
+          slate: { 50: '#f7f4ea', 100: '#f2efe6', 200: '#e3ddcd', 300: '#d3cbb6',
+                   400: '#a8b0a6', 500: '#8b948d', 600: '#55605a', 700: '#3c453f',
+                   800: '#2b332e', 900: '#1d2620' },
+          ink: { 900: '#1d2620', 800: '#2b332e', 700: '#3c453f', 600: '#55605a',
+                 500: '#6d766f', 400: '#8b948d' },
+          /* trainer accent — forest green */
+          turf: { 50: '#e6ede7', 100: '#d5e2d8', 300: '#8fb39a', 500: '#4c8a63',
+                  600: '#386b4c', 700: '#2c5540', 800: '#24402f' },
+          emerald: { 50: '#e6ede7', 100: '#d5e2d8', 200: '#b9cdbe', 300: '#8fb39a',
+                     400: '#6a9d7c', 500: '#4c8a63', 600: '#386b4c', 700: '#2c5540',
+                     800: '#24402f', 900: '#1a3123' },
+          /* gold — flags, preferences, anything advisory */
+          amber: { 50: '#f7f0dc', 100: '#efe4c4', 200: '#e2d3a4', 300: '#d2bd7c',
+                   400: '#c69a3f', 500: '#b8862b', 600: '#a3761f', 700: '#96701f',
+                   800: '#7a5a17', 900: '#63490f' },
+          silk: { 400: '#b8862b', 500: '#96701f' },
+          /* oxblood — declines, closed windows, hard conflicts */
+          red: { 50: '#f8ece7', 100: '#f0d9d1', 200: '#e2b9ab', 300: '#cf9280',
+                 400: '#b8604a', 500: '#a13a26', 600: '#8c2e1d', 700: '#7b2418',
+                 800: '#661e14', 900: '#54180f' },
+          rose: { 50: '#f8ece7', 100: '#f0d9d1', 500: '#a13a26', 600: '#8c2e1d', 700: '#7b2418' },
+          /* track accent — slate blue */
+          indigo: { 50: '#e8eef2', 100: '#d5e0e7', 200: '#b6c8d3', 300: '#8ba6b6',
+                    400: '#5e8298', 500: '#3f6076', 600: '#2f4858', 700: '#263a47',
+                    800: '#1f2f3a', 900: '#18242c' },
+          /* horse-identity tints — kept distinguishable, brought on-palette */
+          sky: { 50: '#e8eef2', 100: '#d5e0e7', 600: '#3f6076' },
+          violet: { 50: '#eeeaf0', 100: '#ded7e2', 600: '#6a5878' },
+          teal: { 50: '#e4edea', 100: '#d0e0db', 600: '#3a7a6b' },
+          orange: { 50: '#f7ece0', 100: '#eeddc9', 600: '#a9662a' },
         },
       },
     },
   }
 </script>
 <style>
-  html, body { background: #f7f8fa; }
-  body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; color: #0b1220; }
+  /* ---------------------------------------------------------------------
+     Component layer — direction B, modern pass.
+     Shape and typography live here; colour comes from the remapped Tailwind
+     scales above. Rounded cards, list rows, info boxes, stat tiles, meters.
+     Serif display headings + Inter body; monospace stays on data that lines
+     up (times, money, records, condition text).
+     --------------------------------------------------------------------- */
+  :root {
+    --r-lg: 16px; --r-md: 12px; --r-sm: 9px;
+    --sh-sm: 0 1px 2px rgba(29,38,32,.06);
+    --sh-md: 0 1px 3px rgba(29,38,32,.05), 0 8px 20px -12px rgba(29,38,32,.18);
+    --sh-lg: 0 1px 3px rgba(29,38,32,.05), 0 18px 40px -20px rgba(29,38,32,.28);
+    --rule: #e3ddcd; --rule-2: #d3cbb6;
+  }
+  html, body { background: #f2efe6; }
+  body { font-family: 'Inter', system-ui, sans-serif; -webkit-font-smoothing: antialiased; color: #1d2620; }
   .screen { display: none; }
   .screen.active { display: block; }
-  .card { background: #fff; border: 1px solid #eef0f4; border-radius: 14px; }
-  .ring-soft { box-shadow: 0 1px 0 rgba(15,23,42,.04), 0 8px 24px -12px rgba(15,23,42,.08); }
-  .pill { display:inline-flex; align-items:center; gap:.25rem; font-size:.7rem; font-weight:600; padding:.15rem .5rem; border-radius:9999px; letter-spacing:.01em; }
+
+  /* Serif display. Screens set sizes with utilities; family and tracking here. */
+  h1, h2, h3, .serif { font-family: 'Source Serif 4', 'Iowan Old Style', Georgia, serif;
+    letter-spacing: -.015em; }
+
+  .card { background: #fffdf8; border: 1px solid var(--rule); border-radius: var(--r-lg); }
+  .ring-soft { box-shadow: var(--sh-md); }
+  .pill { display:inline-flex; align-items:center; gap:.3rem; font-size:.75rem; font-weight:500;
+    padding:.2rem .65rem; border-radius:9999px; letter-spacing:0; line-height:1.5; }
+
+  /* Info box — the modern replacement for a bare notice line. */
+  .info { display:flex; gap:.75rem; align-items:flex-start; padding:.85rem 1rem;
+    border-radius: var(--r-md); background:#f7f0dc; border:1px solid rgba(150,112,31,.22);
+    color:#7a5a17; font-size:.8125rem; line-height:1.55; }
+  .info > i, .info > svg { margin-top:.15rem; flex:none; }
+  .info b { display:block; color:#96701f; font-weight:600; }
+  .info-accent { background:#e6ede7; border-color:rgba(56,107,76,.22); color:#2c5540; }
+  .info-accent b { color:#2c5540; }
+  .info-alarm { background:#f8ece7; border-color:rgba(123,36,24,.2); color:#7b2418; }
+  .info-alarm b { color:#7b2418; }
+
+  /* Condition-check row — one clause, pass or flagged, with the clause beneath. */
+  .checkrow { display:flex; gap:.7rem; align-items:flex-start; padding:.7rem .8rem;
+    border-radius: var(--r-md); background:#f7f4ea; border:1px solid var(--rule); }
+  .checkrow + .checkrow { margin-top:.55rem; }
+  .checkrow .mk { width:22px; height:22px; border-radius:999px; flex:none; display:grid;
+    place-items:center; background:#e6ede7; color:#2c5540; }
+  .checkrow.flag { background:#f7f0dc; border-color:rgba(150,112,31,.22); }
+  .checkrow.flag .mk { background:rgba(184,134,43,.2); color:#96701f; }
+  .checkrow.hard { background:#f8ece7; border-color:rgba(123,36,24,.2); }
+  .checkrow.hard .mk { background:rgba(161,58,38,.16); color:#7b2418; }
+  .checkrow .cl { display:block; font-family:'JetBrains Mono', monospace; font-size:.6875rem;
+    color:#8b948d; margin-top:.25rem; }
+
+  /* Stat tile. */
+  .tile { background:#fffdf8; border:1px solid var(--rule); border-radius: var(--r-lg);
+    padding:1.15rem 1.25rem; box-shadow: var(--sh-sm); }
+  .tile-v { font-family:'Source Serif 4', Georgia, serif; font-size:2rem; font-weight:600;
+    line-height:1.1; margin-top:.6rem; }
+
+  /* Rounded meter — replaces every square progress bar. */
+  .meter { height:6px; border-radius:999px; background:#e8e3d5; overflow:hidden; }
+  .meter > span { display:block; height:100%; border-radius:999px; background:#4c8a63; }
+  .meter-gold > span { background:#b8862b; }
+  .meter-quiet > span { background:#a8b0a6; }
+
+  /* List row — the roster/queue idiom, replacing dense tables. */
+  .list-row { display:flex; align-items:center; gap:1rem; padding:.9rem 1.35rem;
+    border-top:1px solid var(--rule); }
+  .list > .list-row:first-child { border-top:0; }
+  .list-row:hover { background:#f7f4ea; }
+  .list-col { min-width:6rem; }
+  .list-col .k { font-size:.72rem; color:#8b948d; }
+  .list-col .v { font-size:.875rem; margin-top:.1rem; }
+
+  /* Segmented control — replaces the underlined tab strip. */
+  .seg { display:inline-flex; padding:4px; gap:4px; background:#eae5d7; border-radius: var(--r-sm); }
+  .seg > a { padding:.45rem .9rem; border-radius:7px; font-size:.85rem; font-weight:500; color:#55605a; }
+  .seg > a.on { background:#fffdf8; color:#1d2620; box-shadow: var(--sh-sm); }
+
+  /* Filter chip. */
+  .chip { display:inline-flex; align-items:center; gap:.35rem; font-size:.8125rem;
+    padding:.4rem .85rem; border-radius:999px; border:1px solid var(--rule-2);
+    background:#fffdf8; color:#55605a; }
+  .chip.on { background: var(--accent); border-color: var(--accent); color:#fff; }
+
   .nav-item { transition: background-color .15s ease, color .15s ease; }
-  .nav-item.is-active { background: var(--accent-bg); color: var(--accent-strong); font-weight: 500; }
-  .nav-item.is-active i { color: var(--accent-strong); }
-  .row-hover:hover { background: #f8fafc; }
-  .kbd { font-family: 'JetBrains Mono', monospace; font-size:.7rem; padding:.1rem .35rem; border-radius:4px; background:#eef0f4; color:#475569; }
-  .mono { font-family: 'JetBrains Mono', monospace; }
+  .row-hover:hover { background:#f7f4ea; }
+  .kbd { font-family:'JetBrains Mono', monospace; font-size:.7rem; padding:.1rem .35rem;
+    border-radius:4px; background:#eae5d7; color:#55605a; }
+  .mono { font-family:'JetBrains Mono', monospace; }
   .scrollbar-thin::-webkit-scrollbar { width: 6px; height: 6px; }
-  .scrollbar-thin::-webkit-scrollbar-thumb { background: #cbd5e1; border-radius: 3px; }
-  .cond-text { font-family: 'JetBrains Mono', monospace; font-size: .72rem; line-height: 1.6; }
+  .scrollbar-thin::-webkit-scrollbar-thumb { background:#d3cbb6; border-radius: 3px; }
+  /* Condition text keeps the typed-book reading — the one classic holdout. */
+  .cond-text { font-family:'JetBrains Mono', monospace; font-size:.72rem; line-height:1.75;
+    background:#f7f4ea; border:1px solid var(--rule); border-radius: var(--r-md);
+    padding:.85rem 1rem; color:#3c453f; }
+
+  /* Rounded corners on anything the screens still round the old way. */
+  .rounded-lg { border-radius: var(--r-sm) !important; }
+  .rounded-xl { border-radius: var(--r-md) !important; }
+  .rounded-2xl { border-radius: var(--r-lg) !important; }
 
   /* Workspace accent system */
-  body[data-ws="trainer"] { --accent:#059669; --accent-bg:#ecfdf5; --accent-border:#a7f3d0; --accent-strong:#047857; }
-  body[data-ws="track"]   { --accent:#4f46e5; --accent-bg:#eef2ff; --accent-border:#c7d2fe; --accent-strong:#4338ca; }
-  body[data-ws="system"]  { --accent:#475569; --accent-bg:#f1f5f9; --accent-border:#cbd5e1; --accent-strong:#334155; }
+  body[data-ws="trainer"] { --accent:#386b4c; --accent-bg:#e6ede7; --accent-border:#b9cdbe; --accent-strong:#2c5540; }
+  body[data-ws="track"]   { --accent:#2f4858; --accent-bg:#e8eef2; --accent-border:#b6c8d3; --accent-strong:#263a47; }
+  body[data-ws="system"]  { --accent:#55605a; --accent-bg:#f2efe6; --accent-border:#d3cbb6; --accent-strong:#3c453f; }
   .accent-bg { background: var(--accent); }
   .accent-bg-h:hover { background: var(--accent-strong); }
   .accent-text { color: var(--accent-strong); }
   .accent-soft { background: var(--accent-bg); color: var(--accent-strong); }
   .accent-border { border-color: var(--accent-border); }
 
-  body[data-ws="trainer"] .demo-banner { background: linear-gradient(90deg, #065f46, #0b1220); }
-  body[data-ws="track"]   .demo-banner { background: linear-gradient(90deg, #3730a3, #0b1220); }
-  body[data-ws="system"]  .demo-banner { background: linear-gradient(90deg, #334155, #0b1220); }
+  .demo-banner { background:#1d2620; }
+  body[data-ws="trainer"] .demo-banner { background: linear-gradient(90deg, #24402f, #16211a); }
+  body[data-ws="track"]   .demo-banner { background: linear-gradient(90deg, #263a47, #16211a); }
+  body[data-ws="system"]  .demo-banner { background: linear-gradient(90deg, #3c453f, #16211a); }
+
+  /* ---- Sidebar: dark forest chrome ------------------------------------- */
+  .sidebar { background:#24402f !important; color:#eee9dc; }
+  .sidebar-border { border-color:#35513f !important; }
+  .sidebar .text-ink-900, .sidebar .font-semibold { color:#fff; }
+  .sidebar .text-ink-500, .sidebar .text-ink-700 { color:#9db3a5; }
+  .sidebar .bg-white { background: rgba(255,255,255,.06); }
+  .sidebar .border-slate-200 { border-color: rgba(255,255,255,.14) !important; }
+  .sidebar button:hover .text-ink-900 { color:#fff; }
+  .sidebar .nav-item { color:#9db3a5; border-radius: var(--r-sm); }
+  .sidebar .nav-item:hover { background: rgba(255,255,255,.06) !important; color:#eee9dc; }
+  .sidebar .nav-item.is-active { background:#1a3123; color:#fff; font-weight:500; }
+  .sidebar .nav-item.is-active i { color:#8fb39a; }
+  .sidebar .bg-ink-900 { background:#16281d; }
+  /* ---- Topbar ---------------------------------------------------------- */
+  main > header { background:#fffdf8; }
+  #globalSearch { border-radius:999px; background:#f7f4ea; border-color:var(--rule); }
+  #globalSearch:focus { background:#fffdf8; border-color:var(--rule-2); }
+  #bellBtn, #openSidebar { border-radius:999px; }
+  #topCta { border-radius: var(--r-sm); box-shadow: var(--sh-sm); }
+  #searchResults, #bellPanel { border-radius: var(--r-md); background:#fffdf8;
+    border-color: var(--rule); box-shadow: var(--sh-lg); }
+
+  /* The workspace dropdown renders on the light ground, not the dark chrome. */
+  .ws-menu { background:#fffdf8; border-radius: var(--r-md); box-shadow: var(--sh-lg); }
+  .ws-menu .text-ink-900 { color:#1d2620; }
+  .ws-menu .text-ink-500 { color:#8b948d; }
 
   /* Sidebar nav visibility per workspace */
   body[data-ws="trainer"] [data-nav="trainer"],
