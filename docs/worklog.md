@@ -4,6 +4,46 @@ Append-only session journal. Newest entry first.
 
 ---
 
+## 2026-08-06 — classic-direction mockups (three variants, five screens)
+
+**What changed.** Phil supplied two screenshots from a partner's brief attempt —
+a racing-form treatment: forest-green chrome, parchment ground, old-style serif
+headings over monospace uppercase micro-labels, hairline rules, oxblood alert
+bars — and asked for mockups giving the site a classic feel. Scope agreed with
+him: **all five surfaces, three variants.**
+
+Built `docs/mockups/2026-08-06-classic/index.html` — one static file, one
+markup, three themes switchable in place, so the screens compare like for like.
+Every difference between directions is a CSS custom property.
+
+Directions:
+
+- **A · Paddock** — current v2 palette, classic typography only. Cheapest to
+  adopt, least distinctive.
+- **B · Condition Book** — the partner's treatment. Parchment `#f2efe6`, forest
+  green `#24402f` chrome, gold and oxblood accents. (Default on load.)
+- **C · Racing Form** — newsprint. No round corners, ruled tables, tighter rows,
+  gold on near-black chrome. Most characterful, most work to hold consistent.
+
+Screens: landing, trainer dashboard, My Horses, condition book, race
+detail + submission. Data is the real seed (LaRose's 16-horse string, Ellis Park's
+book, the four paired tracks) so the density is honest rather than flattering.
+
+Two deliberate departures from the partner's screenshots: their sidebar reads
+"J. Thomas / Trainer Workspace" against a stock roster — these use Kinnon LaRose
+and the real string; and their "Find a race" action became "Open book", since
+the app takes you to the condition book rather than proposing races.
+
+**Verification.** All three variants dumped in headless Chrome — no `undefined`,
+`NaN`, `[object`, or unrendered `${`. Screenshotted at 1400px.
+
+**What's next / held.** Mockups only — nothing is wired to `app/`, and no gate
+runs against the file. Awaiting Phil's pick before any of it touches
+`index.html` or `app/`. Landing rebuild from earlier today is still on
+`landing-v1-design`, unmerged.
+
+---
+
 ## 2026-08-06 — landing page rebuilt on v1's design
 
 **What changed.** Phil asked why the landing page had changed and said it needs
