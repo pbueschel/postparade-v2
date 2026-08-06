@@ -4,6 +4,43 @@ Append-only session journal. Newest entry first.
 
 ---
 
+## 2026-08-06 — landing page rebuilt on v1's design
+
+**What changed.** Phil asked why the landing page had changed and said it needs
+to be the same one. Finding: it never changed. v2's `index.html` was written
+fresh in `738efeb` (2026-07-29) and never edited since; v1's landing is
+untouched at https://pbueschel.github.io/postparade/. They are separate repos
+and separate Pages sites, so v2 never inherited v1's page.
+
+Verbatim reuse was not possible: v1's landing is built on the removed engine
+("Race recommendations and eligibility, automated"; "Three steps. Then ranked
+spots, every morning."), and `index.html` is in the Rule 0 content-guard list in
+`test/app-smoke.js`. Phil chose: **port v1's design, rewrite the predictive
+copy.**
+
+Regenerated `index.html` in one pass with v1's structure and visual language —
+over-the-hero nav, gradient + grid hero backdrop, stacked/rotated floating card,
+problem strip, numbered step cards, three-column "who it's for", alternating
+feature rows, pilot pricing, dark CTA strip, footer, login modal. Reproduced in
+hand-written CSS with an inline SVG sprite instead of v1's Tailwind + lucide
+CDNs, because v2's `index.html` must stay self-contained.
+
+Copy rewritten to the actual product: hero card is a condition book with a
+flagged preference clause instead of a 94 FIT ring; "how it works" is v2's real
+four-step loop; the owner workspace (which v2 does not have) became "The
+record"; the jockey/ship-share feature row became jockey-at-submission plus
+timestamps. Kept from the old v2 page: the v1→v2 diff table (unchanged, and the
+render-check landmark), the "Still open" callout, and "About the data".
+
+**Verification.** `bun test/conditions-smoke.js` 48/48 · `bun test/app-smoke.js`
+178/178 (including the Rule 0 guards on `index.html`) · `sh test/render-check.sh`
+all 26 routes clean. Screenshotted at 1440px.
+
+**What's next / held.** On branch `landing-v1-design`, **not merged** — merging
+to `main` publishes it, which needs Phil's go-ahead.
+
+---
+
 ## 2026-07-29 — repo created; v2 revision build shipped end to end
 
 **What changed.** Built PostParade v2 from scratch in a new repo as a second,

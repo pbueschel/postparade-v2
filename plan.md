@@ -31,6 +31,9 @@ Date: 2026-07-29.
 Phil authorised publishing this build (repo created, Pages enabled) at the start
 of the 2026-07-29 session, so the site itself is **not** held. What remains held:
 
+- [ ] **Merge `landing-v1-design` to `main`** (2026-08-06). The landing page
+      rebuilt on v1's design, with the predictive copy rewritten. All three gates
+      pass. Merging publishes it to Pages, so it waits on Phil's go-ahead.
 - [ ] **Client/investor walkthrough of v2** — the v1 repo's Held walkthrough
       guide should be re-cut against this build before it goes anywhere outward.
       Do not produce or send outward-facing v2 materials without explicit

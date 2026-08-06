@@ -1,265 +1,788 @@
 <!doctype html>
 <html lang="en">
 <head>
-<meta charset="utf-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>PostParade — condition books, entries, and the racing office</title>
-<meta name="description" content="A two-sided prototype where tracks post condition books and trainers request entries. Facts and conditions only — no ratings, no predictions.">
+<meta charset="utf-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<title>PostParade — Condition books, entries, and the racing office.</title>
+<meta name="description" content="PostParade puts every condition book on your circuit in one place, checks each condition against your horse, and flags conflicts for a person to rule on. Facts and conditions only — nothing predictive." />
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500&display=swap" rel="stylesheet">
 <style>
+  /* ------------------------------------------------------------------
+     Self-contained CSS — this page must work on Pages and as an artifact,
+     so no CDN JS and no utility framework. Reproduces the v1 landing look
+     with the v2 brand tokens.
+     ------------------------------------------------------------------ */
   *, *::before, *::after { box-sizing: border-box; }
   :root {
-    --bg: #fbfaf7; --ink: #0b1220; --ink-2: #475569; --ink-3: #94a3b8;
-    --turf: #059669; --turf-2: #10b981; --turf-soft: #ecfdf5;
-    --indigo: #4f46e5; --indigo-soft: #eef2ff;
-    --amber: #d97706; --amber-soft: #fffbeb;
-    --card: #fff; --border: #eef0f4;
-    --radius: 14px; --shadow: 0 8px 24px -12px rgba(15,23,42,.08);
+    --bg: #fbfaf7;
+    --ink: #0b1220; --ink-800: #11192b; --ink-700: #1a2336; --ink-600: #2a3447;
+    --ink-500: #475569; --ink-400: #94a3b8;
+    --turf-50: #ecfdf5; --turf-100: #d1fae5; --turf-300: #6ee7b7;
+    --turf-500: #10b981; --turf-600: #059669; --turf-700: #047857; --turf-800: #065f46;
+    --indigo: #4f46e5; --indigo-700: #4338ca; --indigo-soft: #eef2ff;
+    --amber: #d97706; --amber-400: #f59e0b; --amber-soft: #fffbeb; --amber-700: #b45309;
+    --slate-50: #f8fafc; --slate-100: #f1f5f9; --slate-200: #e2e8f0;
+    --border: #eef0f4;
+    --radius: 14px;
+    --shadow: 0 1px 0 rgba(15,23,42,.04), 0 8px 24px -12px rgba(15,23,42,.08);
   }
-  body { margin: 0; background: var(--bg); color: var(--ink);
-    font-family: Inter, system-ui, -apple-system, sans-serif; -webkit-font-smoothing: antialiased; line-height: 1.55; }
-  .wrap { max-width: 1060px; margin: 0 auto; padding: 0 20px; }
-  a { color: inherit; }
-  code, .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; font-size: .85em; }
+  html, body { background: var(--bg); }
+  body {
+    margin: 0; color: var(--ink); line-height: 1.55;
+    font-family: Inter, system-ui, -apple-system, sans-serif;
+    -webkit-font-smoothing: antialiased;
+  }
+  a { color: inherit; text-decoration: none; }
+  h1, h2, h3 { letter-spacing: -.025em; margin: 0; }
+  code, .mono { font-family: 'JetBrains Mono', ui-monospace, monospace; }
 
-  header.top { border-bottom: 1px solid var(--border); background: rgba(255,255,255,.85);
-    backdrop-filter: blur(8px); position: sticky; top: 0; z-index: 10; }
-  .top-in { display: flex; align-items: center; gap: 12px; padding: 14px 0; }
-  .logo { width: 32px; height: 32px; border-radius: 9px; background: var(--ink);
-    display: grid; place-items: center; color: #6ee7b7; font-weight: 700; font-size: 15px; }
-  .brand { font-weight: 600; letter-spacing: -.01em; }
-  .tag { font-size: 11px; color: var(--ink-2); border: 1px solid var(--border);
-    border-radius: 999px; padding: 2px 9px; background: #fff; }
-  .top-links { margin-left: auto; display: flex; gap: 16px; font-size: 14px; color: var(--ink-2); }
-  .top-links a:hover { color: var(--ink); }
+  .wrap { max-width: 1100px; margin: 0 auto; padding: 0 24px; }
+  .wrap-narrow { max-width: 940px; margin: 0 auto; padding: 0 24px; }
+  .icon { width: 1em; height: 1em; flex: none; stroke: currentColor; fill: none;
+    stroke-width: 2.2; stroke-linecap: round; stroke-linejoin: round; }
 
-  .hero { padding: 64px 0 40px; }
-  .eyebrow { font-size: 12px; letter-spacing: .08em; text-transform: uppercase; color: var(--turf); font-weight: 600; }
-  h1 { font-size: clamp(30px, 5vw, 46px); line-height: 1.1; letter-spacing: -.025em; margin: 12px 0 0; }
-  .lede { font-size: 18px; color: var(--ink-2); max-width: 62ch; margin: 16px 0 0; }
-  .cta-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
-  .btn { display: inline-flex; align-items: center; gap: 8px; padding: 11px 18px; border-radius: 10px;
-    font-size: 15px; font-weight: 500; text-decoration: none; border: 1px solid transparent; }
-  .btn-primary { background: var(--ink); color: #fff; }
-  .btn-primary:hover { background: #11192b; }
-  .btn-ghost { border-color: #dcdfe5; background: #fff; color: var(--ink); }
-  .btn-ghost:hover { border-color: #c3c8d1; }
-
-  section { padding: 40px 0; }
-  h2 { font-size: 24px; letter-spacing: -.02em; margin: 0 0 6px; }
-  .sub { color: var(--ink-2); margin: 0 0 22px; max-width: 70ch; }
-  h3 { font-size: 16px; margin: 0 0 6px; }
-
-  .grid { display: grid; gap: 16px; }
-  .g2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
-  .g3 { grid-template-columns: repeat(auto-fit, minmax(240px, 1fr)); }
-  .card { background: var(--card); border: 1px solid var(--border); border-radius: var(--radius);
-    box-shadow: var(--shadow); padding: 22px; }
-  .card p { color: var(--ink-2); margin: 0; font-size: 14.5px; }
+  .card { background: #fff; border: 1px solid var(--border); border-radius: var(--radius);
+    box-shadow: var(--shadow); }
   .pill { display: inline-flex; align-items: center; gap: 5px; font-size: 11px; font-weight: 600;
-    padding: 3px 9px; border-radius: 999px; }
-  .pill-turf { background: var(--turf-soft); color: #047857; }
-  .pill-indigo { background: var(--indigo-soft); color: #4338ca; }
-  .pill-amber { background: var(--amber-soft); color: #b45309; }
-  .pill-slate { background: #f1f5f9; color: #475569; }
+    padding: 3px 9px; border-radius: 999px; letter-spacing: .01em; }
+  .pill-turf { background: var(--turf-50); color: var(--turf-700); }
+  .pill-indigo { background: var(--indigo-soft); color: var(--indigo-700); }
+  .pill-amber { background: var(--amber-soft); color: var(--amber-700); }
+  .pill-slate { background: var(--slate-100); color: var(--ink-500); }
+  .pill-red { background: #fef2f2; color: #b91c1c; }
+  .pill-solid { background: var(--turf-600); color: #fff; }
 
-  .split { display: grid; gap: 16px; grid-template-columns: repeat(auto-fit, minmax(320px, 1fr)); }
-  .side { border-left: 3px solid var(--turf); padding-left: 16px; }
-  .side.track { border-left-color: var(--indigo); }
-  ul.clean { margin: 10px 0 0; padding-left: 18px; color: var(--ink-2); font-size: 14.5px; }
-  ul.clean li { margin: 6px 0; }
+  .eyebrow { font-size: 12px; font-weight: 600; letter-spacing: .08em;
+    text-transform: uppercase; color: var(--turf-700); }
+  .eyebrow.muted { color: var(--ink-500); }
 
+  /* ---- top nav (sits over the hero, as in v1) ---- */
+  header.top { position: absolute; top: 0; left: 0; right: 0; z-index: 20; }
+  .top-in { display: flex; align-items: center; justify-content: space-between;
+    padding: 20px 0; gap: 16px; }
+  .brand { display: flex; align-items: center; gap: 9px; font-weight: 600; }
+  .logo { width: 32px; height: 32px; border-radius: 9px; background: var(--ink);
+    display: grid; place-items: center; color: var(--turf-300); }
+  .logo .icon { width: 16px; height: 16px; }
+  .top-nav { display: flex; align-items: center; gap: 28px; font-size: 14px; color: var(--ink-600); }
+  .top-nav a:hover { color: var(--ink); }
+  .top-cta { display: flex; align-items: center; gap: 8px; }
+  @media (max-width: 900px) { .top-nav, .top-cta .desktop-only { display: none; } }
+
+  .btn { display: inline-flex; align-items: center; gap: 8px; border-radius: 10px;
+    font-size: 14px; font-weight: 500; padding: 7px 13px; border: 1px solid transparent;
+    cursor: pointer; font-family: inherit; }
+  .btn-lg { font-size: 15px; padding: 12px 20px; }
+  .btn-dark { background: var(--ink); color: #fff; }
+  .btn-dark:hover { background: var(--ink-800); }
+  .btn-turf { background: var(--turf-600); color: #fff; }
+  .btn-turf:hover { background: var(--turf-700); }
+  .btn-ghost { background: #fff; border-color: var(--slate-200); color: var(--ink); }
+  .btn-ghost:hover { border-color: #c3c8d1; }
+  .btn-plain { background: none; color: var(--ink-700); }
+  .btn-plain:hover { background: var(--slate-100); }
+
+  /* ---- hero ---- */
+  .hero { position: relative; overflow: hidden;
+    background:
+      radial-gradient(1200px 600px at 80% -10%, rgba(16,185,129,.16), transparent 60%),
+      radial-gradient(800px 500px at -10% 30%, rgba(245,158,11,.10), transparent 60%),
+      linear-gradient(180deg, #fbfaf7 0%, #f4f7f4 100%);
+  }
+  .hero .grid-bg { position: absolute; inset: 0; opacity: .6; pointer-events: none;
+    background-image:
+      linear-gradient(rgba(11,18,32,.04) 1px, transparent 1px),
+      linear-gradient(90deg, rgba(11,18,32,.04) 1px, transparent 1px);
+    background-size: 32px 32px; background-position: -1px -1px; }
+  .hero-in { position: relative; display: grid; gap: 44px; align-items: center;
+    grid-template-columns: 1fr; padding: 128px 0 84px; }
+  @media (min-width: 1000px) { .hero-in { grid-template-columns: 1.05fr .95fr; } }
+
+  .badge-row { display: inline-flex; align-items: center; gap: 8px; background: #fff;
+    border: 1px solid var(--slate-200); border-radius: 999px; padding: 5px 13px;
+    font-size: 12px; color: var(--ink-700); margin-bottom: 20px; }
+  .dot { width: 6px; height: 6px; border-radius: 999px; background: var(--turf-500); }
+  h1 { font-size: clamp(32px, 4.4vw, 52px); line-height: 1.05; font-weight: 700; }
+  h1 .accent { color: var(--turf-700); }
+  .lede { margin: 20px 0 0; font-size: 18px; color: var(--ink-600); max-width: 34em; }
+  .cta-row { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 28px; }
+  .assurances { margin-top: 24px; display: flex; flex-wrap: wrap; gap: 18px;
+    font-size: 12px; color: var(--ink-500); }
+  .assurances span { display: inline-flex; align-items: center; gap: 6px; }
+  .assurances .icon { width: 14px; height: 14px; color: var(--turf-600); }
+
+  /* ---- hero visual: the stacked condition-book card ---- */
+  .stack { position: relative; }
+  .float-slow { animation: float 10s ease-in-out infinite; }
+  @keyframes float { 0%,100% { transform: translateY(0); } 50% { transform: translateY(-6px); } }
+  @media (prefers-reduced-motion: reduce) { .float-slow { animation: none; } }
+  .stack .behind { position: absolute; border-radius: var(--radius); border: 1px solid var(--border);
+    box-shadow: var(--shadow); }
+  .stack .behind.a { right: -16px; top: 24px; width: 88%; height: 88%; transform: rotate(3deg);
+    opacity: .7; background: linear-gradient(135deg, #fff, var(--turf-50)); }
+  .stack .behind.b { left: -12px; top: 12px; width: 82%; height: 82%; transform: rotate(-2deg);
+    opacity: .8; background: linear-gradient(135deg, #fff, var(--slate-50)); }
+  .stack .front { position: relative; padding: 20px; }
+  .front-head { display: flex; align-items: center; justify-content: space-between; gap: 10px; }
+  .front-head .who { display: flex; align-items: center; gap: 7px; font-size: 12px; color: var(--ink-500); }
+  .front-head .icon { width: 14px; height: 14px; }
+  .race-line { margin-top: 16px; }
+  .race-line .name { font-weight: 600; font-size: 16px; }
+  .race-line .when { font-size: 12px; color: var(--ink-500); margin-top: 2px; }
+  .chips { margin-top: 10px; display: flex; flex-wrap: wrap; gap: 6px; }
+  .cond-text { margin-top: 14px; padding: 12px; border-radius: 10px; background: var(--slate-50);
+    border: 1px solid var(--border); font-family: 'JetBrains Mono', ui-monospace, monospace;
+    font-size: 11px; line-height: 1.65; color: var(--ink-600); }
+  .checks { margin-top: 14px; display: grid; gap: 7px; font-size: 12.5px; }
+  .checks div { display: flex; align-items: flex-start; gap: 7px; }
+  .checks .icon { width: 14px; height: 14px; margin-top: 3px; color: var(--turf-600); }
+  .checks .flag .icon { color: var(--amber); }
+  .note { margin-top: 14px; padding: 10px 12px; border-radius: 10px; background: var(--amber-soft);
+    color: var(--amber-700); font-size: 12px; display: flex; align-items: flex-start; gap: 8px; }
+  .note .icon { width: 14px; height: 14px; margin-top: 2px; }
+  .tag-float { position: absolute; background: #fff; border: 1px solid var(--border);
+    border-radius: var(--radius); box-shadow: var(--shadow); padding: 8px 12px; font-size: 12px;
+    display: flex; align-items: center; gap: 8px; color: var(--ink-600); }
+  .tag-float.before { bottom: -20px; left: -20px; transform: rotate(-4deg); }
+  .tag-float.after { top: -20px; right: -12px; transform: rotate(3deg); }
+  @media (max-width: 780px) { .tag-float { display: none; } }
+
+  /* ---- section scaffolding ---- */
+  section { padding: 80px 0; }
+  .band { background: #fff; border-top: 1px solid var(--border); border-bottom: 1px solid var(--border); }
+  .head-center { text-align: center; max-width: 640px; margin: 0 auto; }
+  h2 { font-size: clamp(26px, 3.4vw, 38px); font-weight: 600; margin-top: 8px; }
+  .sub { color: var(--ink-600); margin: 12px 0 0; }
+  h3 { font-size: 16px; font-weight: 600; }
+
+  .grid { display: grid; gap: 20px; }
+  .g2 { grid-template-columns: repeat(auto-fit, minmax(300px, 1fr)); }
+  .g3 { grid-template-columns: repeat(auto-fit, minmax(255px, 1fr)); }
+  .g4 { grid-template-columns: repeat(auto-fit, minmax(232px, 1fr)); }
+  .mt-12 { margin-top: 48px; }
+
+  ul.clean { list-style: none; margin: 16px 0 0; padding: 0; font-size: 14px; color: var(--ink-700); }
+  ul.clean li { display: flex; align-items: flex-start; gap: 8px; margin: 8px 0; }
+  ul.clean .icon { width: 15px; height: 15px; margin-top: 4px; color: var(--turf-600); }
+  ul.clean.indigo .icon { color: var(--indigo); }
+  ul.clean.slate .icon { color: var(--ink-500); }
+  ul.clean.bad .icon { color: #ef4444; }
+  .body-copy { color: var(--ink-600); font-size: 14.5px; margin: 12px 0 0; }
+
+  /* ---- problem strip ---- */
+  .problem { display: grid; gap: 36px; align-items: center; grid-template-columns: 1fr; }
+  @media (min-width: 860px) { .problem { grid-template-columns: 1fr 1fr; } }
+
+  /* ---- numbered steps ---- */
+  .step { position: relative; padding: 26px 22px 22px; }
+  .step .num { position: absolute; top: -14px; left: 22px; width: 28px; height: 28px;
+    border-radius: 999px; background: var(--ink); color: #fff; font-size: 13px; font-weight: 600;
+    display: grid; place-items: center; }
+  .step .title-row { display: flex; align-items: center; gap: 8px; margin-top: 6px; }
+  .step .title-row .icon { width: 19px; height: 19px; color: var(--turf-700); }
+
+  /* ---- who it's for ---- */
+  .who-card { padding: 24px 22px; border-top: 4px solid var(--turf-600); }
+  .who-card.track { border-top-color: var(--indigo); }
+  .who-card.record { border-top-color: var(--ink-500); }
+  .who-head { display: flex; align-items: center; gap: 10px; }
+  .who-ico { width: 32px; height: 32px; border-radius: 9px; display: grid; place-items: center;
+    background: var(--turf-50); color: var(--turf-700); }
+  .who-card.track .who-ico { background: var(--indigo-soft); color: var(--indigo-700); }
+  .who-card.record .who-ico { background: var(--slate-100); color: var(--ink-500); }
+  .who-ico .icon { width: 17px; height: 17px; }
+
+  /* ---- feature rows ---- */
+  .feature { display: grid; gap: 44px; align-items: center; grid-template-columns: 1fr; }
+  @media (min-width: 960px) { .feature { grid-template-columns: 1fr 1fr; } }
+  .feature h3 { font-size: clamp(22px, 2.6vw, 30px); font-weight: 600; margin-top: 14px; }
+  .feature .body-copy { font-size: 16px; }
+  .demo { padding: 20px; }
+  .demo-head { display: flex; align-items: center; gap: 8px; font-weight: 600; font-size: 14.5px; }
+  .demo-head .icon { width: 16px; height: 16px; color: var(--turf-700); }
+  .demo.turf { background: linear-gradient(135deg, #fff, var(--turf-50)); }
+  .kv { margin-top: 14px; display: grid; grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+    gap: 14px; }
+  .kv .k { font-size: 11px; color: var(--ink-400); text-transform: uppercase; letter-spacing: .05em; }
+  .kv .v { font-size: 14px; font-weight: 500; margin-top: 2px; }
+  .arrow-note { margin-top: 12px; font-size: 12px; color: var(--ink-500);
+    display: flex; align-items: center; gap: 6px; }
+  .arrow-note .icon { width: 14px; height: 14px; }
+  .rowlet { display: flex; align-items: center; gap: 12px; padding: 12px;
+    border-radius: 10px; border: 1px solid var(--border); }
+  .rowlet + .rowlet { margin-top: 10px; }
+  .rowlet.on { background: var(--turf-50); border-color: var(--turf-100); }
+  .rowlet .who { flex: 1; }
+  .rowlet .who .n { font-size: 14px; font-weight: 500; }
+  .rowlet .who .m { font-size: 12px; color: var(--ink-500); }
+  .stampdot { width: 32px; height: 32px; border-radius: 999px; display: grid; place-items: center;
+    font-size: 11px; font-weight: 600; background: var(--slate-200); color: var(--ink-700); }
+  .rowlet.on .stampdot { background: var(--turf-600); color: #fff; }
+
+  /* ---- what changed table ---- */
+  .table-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius);
+    background: #fff; box-shadow: var(--shadow); }
   table { width: 100%; border-collapse: collapse; font-size: 14px; }
-  .table-scroll { overflow-x: auto; border: 1px solid var(--border); border-radius: var(--radius); background: #fff; }
-  th, td { text-align: left; padding: 10px 14px; border-bottom: 1px solid var(--border); vertical-align: top; }
-  th { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-3);
+  th, td { text-align: left; padding: 11px 15px; border-bottom: 1px solid var(--border);
+    vertical-align: top; }
+  th { font-size: 11px; text-transform: uppercase; letter-spacing: .05em; color: var(--ink-400);
     background: #fafbfc; font-weight: 600; }
   tr:last-child td { border-bottom: 0; }
   td.gone { color: #b91c1c; }
-  td.now { color: #047857; }
+  td.now { color: var(--turf-700); }
 
-  .callout { background: var(--turf-soft); border: 1px solid #a7f3d0; border-radius: var(--radius);
-    padding: 20px 22px; }
-  .callout h3 { color: #065f46; }
-  .callout p { color: #065f46; font-size: 14.5px; margin: 6px 0 0; }
+  /* ---- pricing ---- */
+  .price { padding: 26px 22px; }
+  .price.popular { border: 2px solid var(--turf-500); position: relative; }
+  .price.popular .flagpill { position: absolute; top: -12px; left: 22px; }
+  .price .tier { font-size: 14px; color: var(--ink-500); }
+  .price .amount { display: flex; align-items: baseline; gap: 5px; margin-top: 8px; }
+  .price .amount .n { font-size: 32px; font-weight: 600; }
+  .price .amount .per { font-size: 14px; color: var(--ink-500); }
+  .price .cap { font-size: 12px; color: var(--ink-500); }
 
-  footer { border-top: 1px solid var(--border); padding: 28px 0 48px; color: var(--ink-3); font-size: 13px; }
-  footer a { color: var(--ink-2); }
+  /* ---- callout + CTA + footer ---- */
+  .callout { background: var(--turf-50); border: 1px solid var(--turf-100);
+    border-radius: var(--radius); padding: 22px 24px; }
+  .callout h3 { color: var(--turf-800); }
+  .callout p { color: var(--turf-800); font-size: 14.5px; margin: 8px 0 0; }
+  .cta-dark { background: var(--ink); color: #fff; }
+  .cta-dark h2 { color: #fff; }
+  .cta-dark p { color: var(--ink-400); max-width: 34em; margin: 12px auto 0; }
+  .cta-dark .btn-turf { background: var(--turf-500); color: var(--ink); font-weight: 600; }
+  .cta-dark .btn-turf:hover { background: var(--turf-600); color: #fff; }
+  .cta-dark .btn-onDark { background: rgba(255,255,255,.10); color: #fff; }
+  .cta-dark .btn-onDark:hover { background: rgba(255,255,255,.16); }
+  footer { background: #fff; border-top: 1px solid var(--border); }
+  .foot-in { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between;
+    gap: 16px; padding: 40px 0; font-size: 14px; color: var(--ink-500); }
+  .foot-brand { display: flex; align-items: center; gap: 8px; }
+  .foot-brand .logo { width: 28px; height: 28px; border-radius: 8px; }
+  .foot-brand .logo .icon { width: 14px; height: 14px; }
+  .foot-links { display: flex; flex-wrap: wrap; gap: 20px; }
+  .foot-links a:hover { color: var(--ink); }
+
+  /* ---- login modal (v1 parity; inline JS only, no CDN) ---- */
+  .modal-root { position: fixed; inset: 0; z-index: 50; }
+  .modal-root[hidden] { display: none; }
+  .modal-backdrop { position: absolute; inset: 0; background: rgba(11,18,32,.55);
+    backdrop-filter: blur(2px); border: 0; width: 100%; cursor: default; }
+  .modal { position: absolute; left: 50%; top: 50%; transform: translate(-50%, -50%);
+    width: 92%; max-width: 430px; background: #fff; padding: 28px;
+    border: 1px solid var(--border); border-radius: var(--radius); box-shadow: var(--shadow); }
+  .modal-head { display: flex; align-items: center; justify-content: space-between; }
+  .modal-head .l { display: flex; align-items: center; gap: 9px; font-weight: 600; }
+  .modal-head .logo { width: 28px; height: 28px; border-radius: 8px; }
+  .modal-head .logo .icon { width: 14px; height: 14px; }
+  .x { background: none; border: 0; color: var(--ink-500); cursor: pointer; padding: 4px;
+    display: grid; place-items: center; }
+  .x:hover { color: var(--ink); }
+  .x .icon { width: 16px; height: 16px; }
+  .modal .sso { display: grid; gap: 8px; margin-top: 20px; }
+  .modal .sso a { display: flex; align-items: center; justify-content: center; gap: 8px;
+    padding: 10px 16px; border-radius: 10px; border: 1px solid var(--slate-200);
+    font-size: 14px; font-weight: 500; }
+  .modal .sso a:hover { background: var(--slate-50); }
+  .or { display: flex; align-items: center; gap: 12px; margin: 20px 0;
+    font-size: 12px; color: var(--ink-500); }
+  .or::before, .or::after { content: ""; flex: 1; height: 1px; background: var(--slate-200); }
+  .modal form { display: grid; gap: 10px; }
+  .modal input { width: 100%; padding: 10px 12px; font-size: 14px; font-family: inherit;
+    border-radius: 10px; border: 1px solid var(--slate-200); }
+  .modal input:focus { outline: none; border-color: var(--turf-500); }
+  .modal .foot { margin-top: 20px; padding-top: 16px; border-top: 1px solid var(--border);
+    text-align: center; font-size: 12px; color: var(--ink-500); }
+  .modal .foot a { color: var(--turf-700); font-weight: 500; }
 </style>
 </head>
 <body>
 
+<!-- Icon sprite — inline so the page stays self-contained. -->
+<svg width="0" height="0" style="position:absolute" aria-hidden="true">
+  <symbol id="i-flag" viewBox="0 0 24 24"><path d="M4 15s1-1 4-1 5 2 8 2 4-1 4-1V3s-1 1-4 1-5-2-8-2-4 1-4 1z"/><line x1="4" y1="22" x2="4" y2="15"/></symbol>
+  <symbol id="i-check" viewBox="0 0 24 24"><polyline points="20 6 9 17 4 12"/></symbol>
+  <symbol id="i-x-circle" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><line x1="15" y1="9" x2="9" y2="15"/><line x1="9" y1="9" x2="15" y2="15"/></symbol>
+  <symbol id="i-x" viewBox="0 0 24 24"><line x1="18" y1="6" x2="6" y2="18"/><line x1="6" y1="6" x2="18" y2="18"/></symbol>
+  <symbol id="i-arrow-right" viewBox="0 0 24 24"><line x1="5" y1="12" x2="19" y2="12"/><polyline points="12 5 19 12 12 19"/></symbol>
+  <symbol id="i-arrow-down" viewBox="0 0 24 24"><line x1="12" y1="5" x2="12" y2="19"/><polyline points="19 12 12 19 5 12"/></symbol>
+  <symbol id="i-book" viewBox="0 0 24 24"><path d="M4 19.5A2.5 2.5 0 0 1 6.5 17H20"/><path d="M6.5 2H20v20H6.5A2.5 2.5 0 0 1 4 19.5v-15A2.5 2.5 0 0 1 6.5 2z"/></symbol>
+  <symbol id="i-scan-text" viewBox="0 0 24 24"><path d="M3 7V5a2 2 0 0 1 2-2h2"/><path d="M17 3h2a2 2 0 0 1 2 2v2"/><path d="M21 17v2a2 2 0 0 1-2 2h-2"/><path d="M7 21H5a2 2 0 0 1-2-2v-2"/><line x1="7" y1="9" x2="17" y2="9"/><line x1="7" y1="13" x2="14" y2="13"/></symbol>
+  <symbol id="i-badge-check" viewBox="0 0 24 24"><path d="M12 2l2.4 2h3.2l1 3.1 2.6 1.9-1 3.1 1 3.1-2.6 1.9-1 3.1h-3.2L12 22l-2.4-2H6.4l-1-3.1L2.8 15l1-3.1-1-3.1 2.6-1.9 1-3.1h3.2z"/><polyline points="9 12 11 14 15 10"/></symbol>
+  <symbol id="i-alert" viewBox="0 0 24 24"><path d="M10.3 3.9 1.8 18a2 2 0 0 0 1.7 3h17a2 2 0 0 0 1.7-3L13.7 3.9a2 2 0 0 0-3.4 0z"/><line x1="12" y1="9" x2="12" y2="13"/><line x1="12" y1="17" x2="12.01" y2="17"/></symbol>
+  <symbol id="i-users" viewBox="0 0 24 24"><path d="M17 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"/><circle cx="9" cy="7" r="4"/><path d="M23 21v-2a4 4 0 0 0-3-3.87"/></symbol>
+  <symbol id="i-office" viewBox="0 0 24 24"><path d="M3 21h18"/><path d="M5 21V7l7-4 7 4v14"/><line x1="9" y1="10" x2="9" y2="10.01"/><line x1="15" y1="10" x2="15" y2="10.01"/><line x1="9" y1="14" x2="9" y2="14.01"/><line x1="15" y1="14" x2="15" y2="14.01"/></symbol>
+  <symbol id="i-clock" viewBox="0 0 24 24"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></symbol>
+  <symbol id="i-list" viewBox="0 0 24 24"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></symbol>
+  <symbol id="i-send" viewBox="0 0 24 24"><line x1="22" y1="2" x2="11" y2="13"/><polygon points="22 2 15 22 11 13 2 9 22 2"/></symbol>
+  <symbol id="i-click" viewBox="0 0 24 24"><path d="m9 9 5 12 1.8-5.2L21 14z"/><path d="M7.2 2.2 8 5.1"/><path d="m5.1 8-2.9-.8"/><path d="M14 4.1 12 6"/><path d="m6 12-1.9 2"/></symbol>
+</svg>
+
+<!-- ============== Top nav ============== -->
 <header class="top">
   <div class="wrap top-in">
-    <div class="logo">⚑</div>
-    <div class="brand">PostParade</div>
-    <span class="tag">v2 · revision build</span>
-    <nav class="top-links">
-      <a href="app.html">Open the app</a>
+    <a href="#" class="brand">
+      <span class="logo"><svg class="icon"><use href="#i-flag"/></svg></span>
+      <span>PostParade</span>
+    </a>
+    <nav class="top-nav">
+      <a href="#how">How it works</a>
+      <a href="#who">Who it's for</a>
+      <a href="#features">Features</a>
       <a href="#what-changed">What changed</a>
-      <a href="https://pbueschel.github.io/postparade/">v1</a>
+      <a href="#pricing">Pricing</a>
     </nav>
+    <div class="top-cta">
+      <button id="openLogin" class="btn btn-plain" type="button">Log in</button>
+      <a href="app.html" class="btn btn-plain desktop-only">Open app</a>
+      <a href="app.html#trainer/books" class="btn btn-turf">
+        Start at a condition book <svg class="icon"><use href="#i-arrow-right"/></svg>
+      </a>
+    </div>
   </div>
 </header>
 
-<main class="wrap">
+<!-- ============== Hero ============== -->
+<div class="hero">
+  <div class="grid-bg"></div>
+  <div class="wrap hero-in">
 
-  <div class="hero">
-    <div class="eyebrow">Trainers ⇄ racing offices</div>
-    <h1>Tracks post their condition books.<br>Trainers request entries. People decide.</h1>
-    <p class="lede">
-      A rebuild of the PostParade prototype around one principle: the software handles the paperwork
-      and reads the conditions. It does not rate horses, forecast races, or recommend anything.
-      Every submission is reviewed by a person at the racing office, and every step is timestamped
-      on all three ends — trainer, track, and system record.
-    </p>
-    <div class="cta-row">
-      <a class="btn btn-primary" href="app.html">Open the app →</a>
-      <a class="btn btn-ghost" href="app.html#trainer/books">Start at a condition book</a>
-      <a class="btn btn-ghost" href="app.html#track/queue">See the office queue</a>
+    <div>
+      <div class="badge-row"><span class="dot"></span>For trainers and racing offices</div>
+      <h1>
+        Find the right race.<br>
+        <span class="accent">Every horse. Every week.</span>
+      </h1>
+      <p class="lede">
+        PostParade puts every condition book on your circuit in one place, checks each condition
+        against your horse, and flags what conflicts — so a person at the racing office can rule
+        on it. It does not rate horses, forecast races, or tell you what to enter.
+      </p>
+
+      <div class="cta-row">
+        <a href="app.html" class="btn btn-lg btn-dark">
+          Open the app <svg class="icon"><use href="#i-arrow-right"/></svg>
+        </a>
+        <a href="app.html#track/queue" class="btn btn-lg btn-ghost">
+          <svg class="icon"><use href="#i-click"/></svg>See the office queue
+        </a>
+      </div>
+
+      <div class="assurances">
+        <span><svg class="icon"><use href="#i-check"/></svg>No setup</span>
+        <span><svg class="icon"><use href="#i-check"/></svg>Live sample data</span>
+        <span><svg class="icon"><use href="#i-check"/></svg>2 min to walk through</span>
+      </div>
+    </div>
+
+    <!-- Hero visual: a race as the book writes it, with the checker's read beside it -->
+    <div class="stack">
+      <div class="float-slow">
+        <div class="behind a"></div>
+        <div class="behind b"></div>
+
+        <div class="card front">
+          <div class="front-head">
+            <div class="who">
+              <svg class="icon"><use href="#i-book"/></svg>
+              Ellis Park · condition book
+            </div>
+            <span class="pill pill-turf">4 spots open</span>
+          </div>
+
+          <div class="race-line">
+            <div class="name">Ellis Park · Race 3</div>
+            <div class="when">Sat · Post 2:14 CT · Entries close Wed 10:00</div>
+            <div class="chips">
+              <span class="pill pill-slate">Mdn 75k</span>
+              <span class="pill pill-slate">6f Dirt</span>
+              <span class="pill pill-slate">$85,000 purse</span>
+              <span class="pill pill-slate">12 spots · 8 filled</span>
+            </div>
+          </div>
+
+          <div class="cond-text">
+            FOR MAIDENS, FILLIES AND MARES THREE YEARS OLD AND UPWARD. Three Year Olds, 118 lbs.;
+            Older, 124 lbs. (Preference To Horses That Have Not Started For Less Than $50,000).
+          </div>
+
+          <div class="checks">
+            <div><svg class="icon"><use href="#i-check"/></svg>Filly, 3yo — meets sex and age</div>
+            <div><svg class="icon"><use href="#i-check"/></svg>Maiden — 0 career wins</div>
+            <div class="flag"><svg class="icon"><use href="#i-alert"/></svg>Preference clause: has started for $50,000 — may draw in behind preferred entries</div>
+          </div>
+
+          <div class="note">
+            <svg class="icon"><use href="#i-alert"/></svg>
+            <span><strong>Flagged, not ruled.</strong> Submit anyway and the racing office decides.</span>
+          </div>
+        </div>
+
+        <div class="tag-float before">
+          <span class="pill pill-red">Before</span>
+          <span>Four books, four PDFs, one afternoon</span>
+        </div>
+        <div class="tag-float after">
+          <span class="pill pill-turf">After</span>
+          <span>One book, filtered, in the app</span>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<!-- ============== Problem strip ============== -->
+<div class="band">
+  <div class="wrap" style="padding-top:44px; padding-bottom:44px;">
+    <div class="problem">
+      <div>
+        <div class="eyebrow muted">The problem</div>
+        <h2 style="font-size:clamp(22px,2.8vw,30px)">Placing a horse takes a whole afternoon.</h2>
+        <p class="sub">Pulling condition books off four different track sites. Cross-checking
+          eligibility clause by clause. Comparing purse and distance. Getting a rider named. Then
+          typing it all into the entry box before it closes — and it is all manual.</p>
+      </div>
+      <ul class="clean bad">
+        <li><svg class="icon"><use href="#i-x-circle"/></svg>Condition language is dense and inconsistent across tracks</li>
+        <li><svg class="icon"><use href="#i-x-circle"/></svg>One missed preference tier and your entry does not draw in</li>
+        <li><svg class="icon"><use href="#i-x-circle"/></svg>A decline arrives with no reason attached to the record</li>
+        <li><svg class="icon"><use href="#i-x-circle"/></svg>The right spot at another track on your circuit gets missed entirely</li>
+      </ul>
     </div>
   </div>
+</div>
 
-  <section>
-    <h2>The loop</h2>
-    <p class="sub">Four steps, no black box in the middle.</p>
-    <div class="grid g3">
-      <div class="card">
-        <span class="pill pill-indigo">1 · Track</span>
-        <h3 style="margin-top:10px">Publish the book</h3>
-        <p>The racing office posts its condition book: every race, its purse, surface, distance,
-          conditions as written, and how many spots it holds.</p>
+<!-- ============== How it works ============== -->
+<section id="how">
+  <div class="wrap">
+    <div class="head-center">
+      <div class="eyebrow">How it works</div>
+      <h2>Four steps, and no black box in the middle.</h2>
+      <p class="sub">The software handles the paperwork and reads the conditions. A person at the
+        racing office makes every call.</p>
+    </div>
+
+    <div class="grid g4 mt-12">
+      <div class="card step">
+        <div class="num">1</div>
+        <div class="title-row">
+          <svg class="icon"><use href="#i-book"/></svg>
+          <h3>The track publishes its book</h3>
+        </div>
+        <p class="body-copy">Every race, its purse, surface, distance, conditions as written, and
+          how many spots it holds — posted where trainers already are.</p>
       </div>
-      <div class="card">
-        <span class="pill pill-turf">2 · Trainer</span>
-        <h3 style="margin-top:10px">Read it and submit</h3>
-        <p>Select a track, sort the card chronologically, filter by entry close, race date, surface,
-          type, or purse. Name a jockey, flag AE or MTO, submit.</p>
+      <div class="card step">
+        <div class="num">2</div>
+        <div class="title-row">
+          <svg class="icon"><use href="#i-list"/></svg>
+          <h3>You read it and submit</h3>
+        </div>
+        <p class="body-copy">Sort the card chronologically; filter by entry close, race date,
+          surface, type, or purse. Name a jockey, flag AE or MTO, submit.</p>
       </div>
-      <div class="card">
-        <span class="pill pill-amber">3 · Checker</span>
-        <h3 style="margin-top:10px">Check the conditions</h3>
-        <p>Sex, age, maiden and non-winners ladders, claiming and starter clauses, state-bred
-          restrictions, breed registry, vet's list. Conflicts are flagged, never ruled on.</p>
+      <div class="card step">
+        <div class="num">3</div>
+        <div class="title-row">
+          <svg class="icon"><use href="#i-badge-check"/></svg>
+          <h3>The conditions get checked</h3>
+        </div>
+        <p class="body-copy">Sex, age, maiden and non-winners ladders, claiming and starter clauses,
+          state-bred restrictions, breed registry, vet's list. Conflicts are flagged, never ruled on.</p>
       </div>
-      <div class="card">
-        <span class="pill pill-indigo">4 · Track</span>
-        <h3 style="margin-top:10px">Accept or decline</h3>
-        <p>The office accepts, or declines with a standard reason plus a comment for the one-off
-          cases. The trainer sees the reason, the comment, and the timestamp.</p>
+      <div class="card step">
+        <div class="num">4</div>
+        <div class="title-row">
+          <svg class="icon"><use href="#i-office"/></svg>
+          <h3>The office accepts or declines</h3>
+        </div>
+        <p class="body-copy">A standard reason plus a comment for the one-off cases. You see the
+          reason, the comment, and the timestamp — on the record.</p>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== Who it's for ============== -->
+<div class="band">
+  <section id="who">
+    <div class="wrap">
+      <div class="head-center">
+        <div class="eyebrow">Who it's for</div>
+        <h2>One platform. Both sides of the race.</h2>
+        <p class="sub">Switch between the trainer workspace and the racing-office workspace. Both
+          read the same rows.</p>
+      </div>
+
+      <div class="grid g3 mt-12">
+
+        <div class="card who-card">
+          <div class="who-head">
+            <span class="who-ico"><svg class="icon"><use href="#i-users"/></svg></span>
+            <h3>Trainers</h3>
+          </div>
+          <p class="body-copy">Kinnon LaRose Racing, in the demo. The barn in three actionable
+            states — active, placement requested, entered — and the books for every track on the
+            circuit behind one click.</p>
+          <ul class="clean">
+            <li><svg class="icon"><use href="#i-check"/></svg>Condition books, filtered to your horse</li>
+            <li><svg class="icon"><use href="#i-check"/></svg>Eligibility checked clause by clause</li>
+            <li><svg class="icon"><use href="#i-check"/></svg>Entry windows — deadlines and watched races</li>
+            <li><svg class="icon"><use href="#i-check"/></svg>Submissions log and stored message threads</li>
+          </ul>
+        </div>
+
+        <div class="card who-card track">
+          <div class="who-head">
+            <span class="who-ico"><svg class="icon"><use href="#i-office"/></svg></span>
+            <h3>Racing offices</h3>
+          </div>
+          <p class="body-copy">Ellis Park, Saratoga, Evangeline Downs, Delta Downs. See what is
+            waiting and which races sit under their minimum field, before entries close.</p>
+          <ul class="clean indigo">
+            <li><svg class="icon"><use href="#i-check"/></svg>Entry requests — accept, or decline with a reason</li>
+            <li><svg class="icon"><use href="#i-check"/></svg>Your book as trainers see it, spots and all</li>
+            <li><svg class="icon"><use href="#i-check"/></svg>Horses &amp; history — new here, or N starts here</li>
+            <li><svg class="icon"><use href="#i-check"/></svg>Overnight sheets drafted from accepted entries</li>
+          </ul>
+        </div>
+
+        <div class="card who-card record">
+          <div class="who-head">
+            <span class="who-ico"><svg class="icon"><use href="#i-clock"/></svg></span>
+            <h3>The record</h3>
+          </div>
+          <p class="body-copy">Every submission and decision is an append-only row. The trainer
+            view, the office view, and the system activity log all read the same ones.</p>
+          <ul class="clean slate">
+            <li><svg class="icon"><use href="#i-check"/></svg>Submitted, decided, and by whom</li>
+            <li><svg class="icon"><use href="#i-check"/></svg>Decline reason plus comment, stored</li>
+            <li><svg class="icon"><use href="#i-check"/></svg>Spot counts identical on both ends</li>
+            <li><svg class="icon"><use href="#i-check"/></svg>Raw submission records, viewable</li>
+          </ul>
+        </div>
       </div>
     </div>
   </section>
+</div>
 
-  <section>
-    <h2>Both sides, same records</h2>
-    <div class="split">
-      <div class="side">
-        <span class="pill pill-turf">Trainer workspace</span>
-        <h3 style="margin-top:10px">Kinnon LaRose Racing</h3>
+<!-- ============== Features ============== -->
+<section id="features">
+  <div class="wrap">
+    <div class="head-center">
+      <div class="eyebrow">Features</div>
+      <h2>Built around the work you already do.</h2>
+    </div>
+
+    <!-- Feature 1: eligibility -->
+    <div class="feature mt-12">
+      <div>
+        <span class="pill pill-turf"><svg class="icon" style="width:12px;height:12px"><use href="#i-badge-check"/></svg>Eligibility</span>
+        <h3>Every condition, checked.</h3>
+        <p class="body-copy">Age, sex, prior wins, claiming and starter history, state-bred
+          restrictions, breed registry, preference clauses — all read against the horse's record.
+          If they meet it, you know. If they do not, you know which clause and why.</p>
         <ul class="clean">
-          <li><strong>Dashboard</strong> — the barn in three actionable states: active, placement requested, entered. Filterable. No performance figures.</li>
-          <li><strong>My horses</strong> — the whole roster; add, remove, pursue races.</li>
-          <li><strong>See condition books</strong> — pick a track, read the book, filter it, submit. “See all conditions” shows the raw text when you read a clause differently than the checker.</li>
-          <li><strong>Entry windows</strong> — deadlines and watched races, on a page you visit on purpose.</li>
-          <li><strong>Submissions</strong> — every request you have sent and what came back.</li>
-          <li><strong>Messages</strong> — a stored thread with each racing office.</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>Shows the clause next to the pass or the flag — auditable, not magic</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>Flags a conflict; it never rules on one</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>“Submit anyway” always available, with the flags snapshotted onto the record</li>
         </ul>
       </div>
-      <div class="side track">
-        <span class="pill pill-indigo">Track workspace</span>
-        <h3 style="margin-top:10px">Ellis Park · Saratoga · Evangeline Downs · Delta Downs</h3>
+      <div class="card demo turf">
+        <div class="demo-head">
+          <svg class="icon"><use href="#i-badge-check"/></svg>
+          Conditions · Pecan Grove
+        </div>
+        <ul class="clean" style="margin-top:14px">
+          <li><svg class="icon"><use href="#i-check"/></svg>3yo &amp; up fillies and mares</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>Maidens · career 0 wins</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>Thoroughbred · registry on file</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>Weight: 118 lbs</li>
+        </ul>
+        <div class="note">
+          <svg class="icon"><use href="#i-alert"/></svg>
+          <span><strong>Preference clause.</strong> Has started for less than $50,000 — preferred
+            entries fill first. The office decides who draws in.</span>
+        </div>
+      </div>
+    </div>
+
+    <!-- Feature 2: condition parser -->
+    <div class="feature mt-12">
+      <div class="card demo" style="order:2">
+        <div class="cond-text" style="margin-top:0">
+          Mdn 120k · 6½ Furlongs · Purse $120,000. FOR MAIDENS, FILLIES AND MARES THREE YEARS OLD
+          AND UPWARD. Three Year Olds, 118 lbs., Older, 124 lbs. (Preference To Horses That Have
+          Not Started For Less Than $50,000).
+        </div>
+        <div class="arrow-note">
+          <svg class="icon"><use href="#i-arrow-down"/></svg>read into structured fields
+        </div>
+        <div class="kv">
+          <div><div class="k">Race type</div><div class="v">Maiden Special Weight</div></div>
+          <div><div class="k">Distance · Surface</div><div class="v">6.5f · Dirt</div></div>
+          <div><div class="k">Sex / Age</div><div class="v">F&amp;M · 3yo+</div></div>
+          <div><div class="k">Preference</div><div class="v">Started for &lt; $50k</div></div>
+        </div>
+      </div>
+      <div style="order:1">
+        <span class="pill pill-turf"><svg class="icon" style="width:12px;height:12px"><use href="#i-scan-text"/></svg>Conditions, structured</span>
+        <h3>Condition books, in one place.</h3>
+        <p class="body-copy">Condition text becomes structured fields — type, distance, surface,
+          purse, sex and age, the ladder, the clauses — so a card can be sorted and filtered
+          instead of read four times. The raw text stays one click away, because you may read a
+          clause differently than the checker does.</p>
         <ul class="clean">
-          <li><strong>Racing office</strong> — what is waiting, and which races sit under their minimum field.</li>
-          <li><strong>Our condition book</strong> — the book as trainers see it, with spots and pending requests per race.</li>
-          <li><strong>Entry requests</strong> — accept, or decline with a reason and a comment on the record.</li>
-          <li><strong>Horses &amp; history</strong> — who is entered on each card, plus the standing record of every horse that has come through: new here, or N starts here.</li>
-          <li><strong>Overnight sheets</strong> — drafted automatically from accepted entries.</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>“See all conditions” shows the book's own words, verbatim</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>Filter by entry close, race date, surface, type, or purse</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>Extras added after the book publishes show up in the bell</li>
         </ul>
       </div>
     </div>
-  </section>
 
+    <!-- Feature 3: the record -->
+    <div class="feature mt-12">
+      <div>
+        <span class="pill pill-turf"><svg class="icon" style="width:12px;height:12px"><use href="#i-clock"/></svg>Records &amp; riders</span>
+        <h3>Every step timestamped, on both ends.</h3>
+        <p class="body-copy">A jockey is named at submission, from a rider list with agents, so the
+          office can catch a double-booking before the box closes. Submitted, decided, by whom —
+          the trainer view, the office view, and the system log read the same append-only rows.</p>
+        <ul class="clean">
+          <li><svg class="icon"><use href="#i-check"/></svg>A rider is required at submission</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>Declines carry a standard reason plus a comment</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>AE and MTO designations carry through to the overnight</li>
+        </ul>
+      </div>
+      <div class="card demo">
+        <div class="rowlet on">
+          <span class="stampdot">FG</span>
+          <div class="who">
+            <div class="n">Foley G.</div>
+            <div class="m">Named at submission · agent on file</div>
+          </div>
+          <span class="pill pill-solid">Named</span>
+        </div>
+        <div class="rowlet">
+          <span class="stampdot">VR</span>
+          <div class="who">
+            <div class="n">Velazquez J.</div>
+            <div class="m">Already named on Race 5 this card</div>
+          </div>
+          <span class="pill pill-red">Double-booked</span>
+        </div>
+        <div class="cond-text" style="font-size:11px">
+          submitted   Wed 08:42 CT · Kinnon LaRose<br>
+          decided     Wed 11:07 CT · accepted by racing office<br>
+          spots       12 · 9 filled · 3 open
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== What changed from v1 ============== -->
+<div class="band">
   <section id="what-changed">
-    <h2>What changed from v1</h2>
-    <p class="sub">The first build put a recommendation engine at the centre. This one takes it out and
-      puts the condition book there instead.</p>
-    <div class="table-scroll">
-      <table>
-        <thead>
-          <tr><th style="width:34%">v1</th><th style="width:33%">v2</th><th>Why</th></tr>
-        </thead>
-        <tbody>
-          <tr><td class="gone">Fit scores, acceptance likelihood, draw-in probability</td>
-              <td class="now">A condition checker that flags conflicts</td>
-              <td>Eligibility is a rule question. Outcome is not our call.</td></tr>
-          <tr><td class="gone">Recommendations screen</td>
-              <td class="now">See condition books → select track → race list</td>
-              <td>Trainers read the book. The app gets them to it faster.</td></tr>
-          <tr><td class="gone">“Spot alerts” and a dashboard block of closing entries</td>
-              <td class="now">One <strong>Entry windows</strong> page</td>
-              <td>The capability stays; it stops being pushed at you.</td></tr>
-          <tr><td class="gone">Suggested ships, win rates, speed and class figures</td>
-              <td class="now">Records and past performances, as facts</td>
-              <td>Nothing statistical about a future or past result.</td></tr>
-          <tr><td class="gone">Horses tab deep-linked to one horse</td>
-              <td class="now">A real roster for trainers; entries and history for tracks</td>
-              <td>It was a bug, and the tab had no defined contents.</td></tr>
-          <tr><td class="gone">Requests inbox</td>
-              <td class="now">A submissions log, trainer → track</td>
-              <td>Submissions are the record that needs storing.</td></tr>
-          <tr><td class="gone">No messaging</td>
-              <td class="now">Stored threads between office and barn</td>
-              <td>Most placement questions are a conversation.</td></tr>
-          <tr><td class="gone">Hover to act on a horse row</td>
-              <td class="now">The underlined horse name is the link, always</td>
-              <td>Hover did not fire on horses already placed.</td></tr>
-          <tr><td class="gone">Thin horse pages</td>
-              <td class="now">Equibase-shaped profiles</td>
-              <td>Color, sex, state bred, year foaled, sire and dam, connections of last start.</td></tr>
-        </tbody>
-      </table>
-    </div>
-  </section>
-
-  <section>
-    <h2>Also in this build</h2>
-    <div class="grid g2">
-      <div class="card">
-        <h3>A jockey is named at submission</h3>
-        <p>Required, from a rider list with agents, so the office can catch double-bookings before
-          the entry box closes.</p>
+    <div class="wrap">
+      <div class="head-center">
+        <div class="eyebrow">The revision</div>
+        <h2>What changed from v1</h2>
       </div>
-      <div class="card">
-        <h3>“Submit anyway” when a conflict is flagged</h3>
-        <p>The checker can be wrong, and clauses are ambiguous. The trainer may always override; the
-          flags are snapshotted onto the record so the office reviews what was shown.</p>
-      </div>
-      <div class="card">
-        <h3>AE / MTO designations</h3>
-        <p>Also-eligible and main-track-only requests carry through to the overnight sheet.</p>
-      </div>
-      <div class="card">
-        <h3>Overnights and extras notify</h3>
-        <p>When a card's overnight posts or a race is added after the book, it shows up in the bell
-          and on Entry windows.</p>
-      </div>
-      <div class="card">
-        <h3>Spots are public to both sides</h3>
-        <p>Spots filled, openings left, also-eligible places used, requests awaiting review — one
-          number, same on both ends.</p>
-      </div>
-      <div class="card">
-        <h3>Timestamps on three ends</h3>
-        <p>Submitted, decided, by whom. The trainer view, the office view, and the system activity
-          log read the same append-only rows.</p>
+      <p class="sub" style="text-align:center;max-width:640px;margin:12px auto 28px">The first build put a recommendation engine at the centre. This one takes it out and
+        puts the condition book there instead.</p>
+      <div class="table-scroll">
+        <table>
+          <thead>
+            <tr><th style="width:34%">v1</th><th style="width:33%">v2</th><th>Why</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="gone">Fit scores, acceptance likelihood, draw-in probability</td>
+                <td class="now">A condition checker that flags conflicts</td>
+                <td>Eligibility is a rule question. Outcome is not our call.</td></tr>
+            <tr><td class="gone">Recommendations screen</td>
+                <td class="now">See condition books → select track → race list</td>
+                <td>Trainers read the book. The app gets them to it faster.</td></tr>
+            <tr><td class="gone">“Spot alerts” and a dashboard block of closing entries</td>
+                <td class="now">One <strong>Entry windows</strong> page</td>
+                <td>The capability stays; it stops being pushed at you.</td></tr>
+            <tr><td class="gone">Suggested ships, win rates, speed and class figures</td>
+                <td class="now">Records and past performances, as facts</td>
+                <td>Nothing statistical about a future or past result.</td></tr>
+            <tr><td class="gone">Horses tab deep-linked to one horse</td>
+                <td class="now">A real roster for trainers; entries and history for tracks</td>
+                <td>It was a bug, and the tab had no defined contents.</td></tr>
+            <tr><td class="gone">Requests inbox</td>
+                <td class="now">A submissions log, trainer → track</td>
+                <td>Submissions are the record that needs storing.</td></tr>
+            <tr><td class="gone">No messaging</td>
+                <td class="now">Stored threads between office and barn</td>
+                <td>Most placement questions are a conversation.</td></tr>
+            <tr><td class="gone">Hover to act on a horse row</td>
+                <td class="now">The underlined horse name is the link, always</td>
+                <td>Hover did not fire on horses already placed.</td></tr>
+            <tr><td class="gone">Thin horse pages</td>
+                <td class="now">Equibase-shaped profiles</td>
+                <td>Color, sex, state bred, year foaled, sire and dam, connections of last start.</td></tr>
+          </tbody>
+        </table>
       </div>
     </div>
   </section>
+</div>
 
-  <section>
+<!-- ============== Pricing ============== -->
+<section id="pricing">
+  <div class="wrap-narrow">
+    <div class="head-center">
+      <div class="eyebrow">Pricing</div>
+      <h2>Pilot pricing for early stables.</h2>
+      <p class="sub">We're working with a small group of trainers and racing offices to shape v1.
+        Pricing scales with stable size; pilot members get founding rates locked in.</p>
+    </div>
+
+    <div class="grid g3 mt-12">
+      <div class="card price">
+        <div class="tier">Independent trainer</div>
+        <div class="amount"><span class="n">$200</span><span class="per">/ month</span></div>
+        <div class="cap">Up to 15 horses</div>
+        <ul class="clean">
+          <li><svg class="icon"><use href="#i-check"/></svg>All trainer features</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>One circuit</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>Email support</li>
+        </ul>
+      </div>
+      <div class="card price popular">
+        <span class="pill pill-solid flagpill">Most popular</span>
+        <div class="tier">Mid-size stable</div>
+        <div class="amount"><span class="n">$600</span><span class="per">/ month</span></div>
+        <div class="cap">Up to 60 horses · multi-circuit</div>
+        <ul class="clean">
+          <li><svg class="icon"><use href="#i-check"/></svg>Everything in Trainer</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>Every book on the circuit</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>Message threads with each office</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>Entry-window alerts by phone &amp; SMS</li>
+        </ul>
+      </div>
+      <div class="card price">
+        <div class="tier">Racing office</div>
+        <div class="amount"><span class="n">Custom</span></div>
+        <div class="cap">Per meet</div>
+        <ul class="clean">
+          <li><svg class="icon"><use href="#i-check"/></svg>Publish your condition book</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>Entry-request queue and overnights</li>
+          <li><svg class="icon"><use href="#i-check"/></svg>White-glove onboarding</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- ============== Still open ============== -->
+<div class="band">
+  <div class="wrap" style="padding-top:44px; padding-bottom:44px;">
     <div class="callout">
       <h3>Still open</h3>
       <p><strong>Equipment at entry</strong> — whether the track requires equipment declared at submission
@@ -268,27 +791,102 @@
         <strong>Planned, not built:</strong> track-branded PDF condition books and overnights, and a
         question box on the horse profile answered from the record.</p>
     </div>
-  </section>
 
-  <section>
-    <h2>About the data</h2>
-    <p class="sub">
-      Real where it is cited: trainer, horses, sires and dams, owners, and the results referenced in
-      each profile. Illustrative where it must be: the condition books, race cards, spot counts,
-      messages, and the demo calendar, which rolls forward off the clock so the books are always open.
-      Nothing in here is a rating or a projection, and no number claims to be one.
-      This is a concept prototype, not a system of record.
-    </p>
-  </section>
+    <div style="margin-top:32px">
+      <div class="eyebrow muted">About the data</div>
+      <p class="sub" style="max-width:70ch">
+        Real where it is cited: trainer, horses, sires and dams, owners, and the results referenced in
+        each profile. Illustrative where it must be: the condition books, race cards, spot counts,
+        messages, and the demo calendar, which rolls forward off the clock so the books are always open.
+        Nothing in here is a rating or a projection, and no number claims to be one.
+        This is a concept prototype, not a system of record.
+      </p>
+    </div>
+  </div>
+</div>
 
-</main>
+<!-- ============== CTA strip ============== -->
+<div class="cta-dark">
+  <div class="wrap-narrow" style="padding-top:64px; padding-bottom:64px; text-align:center;">
+    <h2>See it in your own barn.</h2>
+    <p>Walk through the demo first, then we'll wire up your circuit. No setup work on your side.</p>
+    <div class="cta-row" style="justify-content:center">
+      <a href="app.html#trainer/books" class="btn btn-lg btn-turf">
+        Start at a condition book <svg class="icon"><use href="#i-arrow-right"/></svg>
+      </a>
+      <a href="app.html" class="btn btn-lg btn-onDark">
+        <svg class="icon"><use href="#i-click"/></svg>Open the app
+      </a>
+    </div>
+  </div>
+</div>
 
+<!-- ============== Footer ============== -->
 <footer>
-  <div class="wrap">
-    PostParade v2 — concept prototype · <a href="app.html">Open the app</a> ·
-    <a href="https://pbueschel.github.io/postparade/">v1 build</a>
+  <div class="wrap foot-in">
+    <div class="foot-brand">
+      <span class="logo"><svg class="icon"><use href="#i-flag"/></svg></span>
+      <span style="color:var(--ink-700);font-weight:500">PostParade</span>
+      <span style="color:var(--ink-400)">·</span>
+      <span>v2 · concept prototype · 2026</span>
+    </div>
+    <div class="foot-links">
+      <a href="#how">How it works</a>
+      <a href="#features">Features</a>
+      <a href="#pricing">Pricing</a>
+      <a href="#what-changed">What changed</a>
+      <a href="app.html">Open the app</a>
+      <a href="https://pbueschel.github.io/postparade/">v1 build</a>
+    </div>
   </div>
 </footer>
 
+<!-- ============== Login modal ============== -->
+<div id="loginModal" class="modal-root" hidden>
+  <button class="modal-backdrop" data-close aria-label="Close"></button>
+  <div class="modal" role="dialog" aria-modal="true" aria-label="Log in">
+    <div class="modal-head">
+      <div class="l">
+        <span class="logo"><svg class="icon"><use href="#i-flag"/></svg></span>
+        <span>Welcome back</span>
+      </div>
+      <button class="x" data-close type="button" aria-label="Close">
+        <svg class="icon"><use href="#i-x"/></svg>
+      </button>
+    </div>
+
+    <div class="sso">
+      <a href="app.html">
+        <svg width="16" height="16" viewBox="0 0 18 18" xmlns="http://www.w3.org/2000/svg"><path d="M17.64 9.2c0-.64-.06-1.25-.16-1.84H9v3.49h4.84a4.14 4.14 0 01-1.79 2.72v2.26h2.9c1.7-1.56 2.69-3.87 2.69-6.63z" fill="#4285F4"/><path d="M9 18c2.43 0 4.47-.8 5.95-2.18l-2.9-2.26c-.81.54-1.84.86-3.05.86-2.34 0-4.32-1.58-5.03-3.7H.97v2.33A9 9 0 009 18z" fill="#34A853"/><path d="M3.97 10.72A5.41 5.41 0 013.68 9c0-.6.1-1.18.29-1.72V4.95H.97A9 9 0 000 9c0 1.45.35 2.83.97 4.05l3-2.33z" fill="#FBBC05"/><path d="M9 3.58c1.32 0 2.5.45 3.44 1.35l2.58-2.58A9 9 0 009 0 9 9 0 00.97 4.95l3 2.33C4.68 5.16 6.66 3.58 9 3.58z" fill="#EA4335"/></svg>
+        Continue with Google
+      </a>
+      <a href="app.html">Continue with email link</a>
+    </div>
+
+    <div class="or">or sign in with a password</div>
+
+    <form onsubmit="event.preventDefault(); location.href='app.html'">
+      <input type="email" placeholder="you@stable.com" autocomplete="email">
+      <input type="password" placeholder="Password" autocomplete="current-password">
+      <button type="submit" class="btn btn-dark" style="justify-content:center;padding:11px 16px">Sign in</button>
+    </form>
+
+    <div class="foot">
+      No account? <a href="app.html">Skip — try the demo</a>
+    </div>
+  </div>
+</div>
+
+<script>
+  (function () {
+    var modal = document.getElementById('loginModal');
+    var open = document.getElementById('openLogin');
+    function show() { modal.hidden = false; }
+    function hide() { modal.hidden = true; }
+    open.addEventListener('click', show);
+    modal.querySelectorAll('[data-close]').forEach(function (el) { el.addEventListener('click', hide); });
+    document.addEventListener('keydown', function (e) { if (e.key === 'Escape') hide(); });
+  })();
+</script>
 </body>
 </html>
